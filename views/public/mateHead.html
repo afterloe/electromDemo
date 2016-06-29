@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <style type="text/css">
+        .mission_board {
+            font-size: 14px;
+            font-family: "微软雅黑";
+            font-weight: bold;
+            height: 40px color: #0e0e0e;
+            cursor: default;
+            background-color: #eaeaea;
+            text-overflow: ellipsis;
+        }
+        .userPicture {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            padding-left: 90px;
+        }
+        .mission_board > img {
+          width: 80px;
+          height: 80px;
+          margin: auto;
+          position: absolute;
+        }
+        .flowAdd {
+            height: 30px;
+            width: 98%;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            padding-left: 90px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            cursor:pointer;
+            color: #5683ea;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="row mission_board">
+        <div class="rotation-animation">
+            <button id="btn_closeWindow" type="button" class="close" ng-click="closeWindow()">&times;</button>
+            <button id="btn_miniWindow" type="button" class="close" ng-click="minWindow()">-</button>
+        </div>
+        <img src="{{mate_user_pic}}" alt="user Head portrait" class="img-rounded">
+        <div class="userPicture">
+             {{mate_index_title}}
+        </div>
+    </div>
+    <div class="row flowAdd">{{index_flowAdd}}</div>
+</body>
+
+</html>

@@ -1,0 +1,27 @@
+{
+  "mainFrameWindow" : {
+    "width" : "auto",
+    "height" : "auto",
+    "x" : "auto",
+    "y" : "auto",
+    "resizable" : false,
+    "movable" : true,
+    "alwaysOnTop" : true,
+    "frame" : false,
+    "title" : "Engineer White",
+    "icon" : "applogo.ico",
+    "useContentSize" : true,
+    "darkTheme" : true,
+    "debug" : true
+  },
+  "contextFrameWindow" : {
+    "width" : "auto",
+    "height" : "auto",
+    "frame" : false,
+    "resizable" : false,
+    "title" : "Engineer White - ",
+    "useContentSize" : true,
+    "darkTheme" : true,
+    "debug" : true
+  }
+}

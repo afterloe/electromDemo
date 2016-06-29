@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <style type="text/css">
+    .mission_board {
+      font-size: 14px;
+      font-family: "微软雅黑";
+      font-weight: bold;
+      color: #0e0e0e;
+      cursor: default;
+      background-color: #eaeaea;
+    }
+
+    .mission_board> div> img {
+      max-width: 30px;
+      max-height: 30px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="row mission_board">
+    <div class="rotation-animation">
+      <button type="button" class="close" ng-click="closeWindow()">&times;</button>
+      <button type="button" class="close" ng-click="minWindow()">-</button>
+    </div>
+    <div  style="-webkit-user-select: none;-webkit-app-region: drag;width:85%">
+      <img src="../sources/applogo.ico" alt="Engineer Mate logo" class="img-rounded"> 欢迎来到小美
+    </div>
+  </div>
+</body>
+
+</html>
