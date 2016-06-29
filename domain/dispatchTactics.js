@@ -23,7 +23,6 @@ class DispatchTactics {
     }
 
     openFrameWindow(param) {
-      // param.url = `file://${__dirname}/../views/loginMate.html`;
       param.url = `file://${__dirname}/../views/frameWindow.html?loadUrl=${param.url}`;
       windowBuilder.buildContextFrameWindow(param);
     }

@@ -41,14 +41,13 @@ class MainFrameWindow {
         } = engineerWhite.screen;
         if (undefined === mainFrameWindow.width || "auto" === mainFrameWindow.width) mainFrameWindow.width = Math.ceil(width * 0.20) > 390 ? Math.ceil(width * 0.20) : 390;
         if (undefined === mainFrameWindow.height || "auto" === mainFrameWindow.height) mainFrameWindow.height = Math.ceil(height * 0.55) > 600 ? Math.ceil(height * 0.55) : 600;
-        if (undefined === mainFrameWindow.x || "auto" === mainFrameWindow.x) mainFrameWindow.x = undefined;
-        if (undefined === mainFrameWindow.y || "auto" === mainFrameWindow.y) mainFrameWindow.y = undefined;
+        if (undefined === mainFrameWindow.x || "auto" === mainFrameWindow.x) mainFrameWindow.x = Math.ceil(width - mainFrameWindow.width);
+        if (undefined === mainFrameWindow.y || "auto" === mainFrameWindow.y) mainFrameWindow.y = Math.ceil(height - mainFrameWindow.height);
         mainFrameWindow.icon = nativeImage.createFromPath(`${__dirname}/../sources/${mainFrameWindow.icon}`);
         engineerWhite.icon = mainFrameWindow.icon;
         frameWindow = new BrowserWindow(mainFrameWindow);
         if (mainFrameWindow.debug) frameWindow.webContents.openDevTools();
         frameWindow.loadURL(`file://${__dirname}/../views/index.html`);
-        //frameWindow.loadURL(core.readUserInfo() ? `file://${__dirname}/../views/index.html` : `file://${__dirname}/../views/loginMate.html`);
         frameWindow.on("closed", () => {
             frameWindow = null;
             global.engineerWhite.contextFrameWindow = null;

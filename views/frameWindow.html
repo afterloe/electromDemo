@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="frameWindowApp" ng-controller="frameWindowCtrl">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Engineer White - {{title}}</title>
+    <link rel="stylesheet" href="../sources/stylesheets/lib/tBootstrap.min.css">
+    <link rel="stylesheet" href="../sources/stylesheets/base.css">
+    <link rel="stylesheet" href="../sources/stylesheets/frameWindow.css">
+    <script src="../sources/javascripts/lib/angular.min.js"></script>
+</head>
+
+<body>
+    <!-- #include virtual = "../views/public/head.html" -->
+    <div ng-include="'../views/public/head.html'"></div>
+
+    <div class="frameContext">
+        <uib-tabset active="active" type="pills">
+            <uib-tab index="$index + 1" ng-repeat="tab in tabs" heading="{{tab.title}}" select="loadPage(tab.url)" disable="tab.disabled">
+
+            </uib-tab>
+        </uib-tabset>
+
+    </div>
+    <webview id="context_webView" autosize="on" style="{{context_height}}"></webview>
+    <script type="text/javascript" src="../controller/contro_frameWindow.js"></script>
+</body>
+
+</html>

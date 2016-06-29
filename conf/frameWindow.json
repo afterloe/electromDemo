@@ -5,14 +5,14 @@
     "x" : "auto",
     "y" : "auto",
     "resizable" : false,
-    "movable" : true,
+    "movable" : false,
     "alwaysOnTop" : true,
     "frame" : false,
     "title" : "Engineer White",
     "icon" : "applogo.ico",
     "useContentSize" : true,
     "darkTheme" : true,
-    "debug" : true
+    "debug" : false
   },
   "contextFrameWindow" : {
     "width" : "auto",
