@@ -1,6 +1,3 @@
-.ng-scope {
-  padding: 0 7px;
-}
 .frameContext {
   margin-top: 3px;
 }
@@ -12,4 +9,30 @@ webview.hide {
   flex: 0 1;
   width: 0px;
   height: 0px;
+}
+.suspended {
+  bottom: 80px;
+  height: 60px;
+  position: fixed;
+  right: 20px;
+  width: 60px;
+}
+.suspended a {
+  background: #5fadff none repeat scroll 0 0;
+  border-radius: 60px;
+  color: #ffffff;
+  display: block;
+  height: 60px;
+  line-height: 60px;
+  text-align: center;
+  width: 60px;
+}
+.suspended a:hover {
+  background: #8dc5ff none repeat scroll 0 0;
+}
+.suspended a:active {
+  background: #3d9bff none repeat scroll 0 0;
+}
+.suspended a img {
+  cursor: pointer;
 }

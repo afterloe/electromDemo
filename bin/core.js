@@ -3,7 +3,7 @@
  */
 const [fs,uuid,dBug,dataPath] = [require("fs"), require('node-uuid'), true, `${process.env.APPDATA}/EngineeringWhite`];
 
-let [userDir,readVersionInfo,deleteFile,uploadMateSite,updateLoinInfos,postFiles,randomCode,readUserInfo,vers,result,writeJournal,getTime,formatDate,getDataPath] = [
+let [userDir,readVersionInfo,deleteFile,uploadMateSite,updateLoinInfos,postFiles,randomCode,readUserInfo,vers,result,writeJournal,getTime,formatDate,getDataPath,writeData] = [
 /**
  * userDir
  *
@@ -267,6 +267,17 @@ let [userDir,readVersionInfo,deleteFile,uploadMateSite,updateLoinInfos,postFiles
     () => {
         if (!fs.existsSync(dataPath)) fs.mkdirSync(dataPath);
         return dataPath;
+    },
+/**
+ * writeData
+ *
+ */
+    (data, path, flag) => {
+        data = JSON.stringify(data);
+        if (flag)
+            configuer.encryption(data, path);
+        else
+            fs.writeFileSync(path, data);
     }
 ];
 
@@ -297,6 +308,8 @@ module.exports.getTime = getTime;
 module.exports.formatDate = formatDate;
 
 module.exports.getDataPath = getDataPath;
+
+module.exports.writeData = writeData;
 
 var hexcase = 0, b64pad = "", chrsz = 8;
 module.exports.hex_md5 = function (b) {

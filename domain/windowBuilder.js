@@ -96,7 +96,7 @@ class windowBuilder {
         let frameWindow = global.engineerWhite.contextFrameWindow;
         if (frameWindow) {
             frameWindow.loadURL(_param.url);
-            frameWindow.setTitle(_param.title)
+            frameWindow.setTitle(_param.title);
             if (!frameWindow.isVisible()) frameWindow.show();
             else frameWindow.focus();
             return frameWindow;

@@ -1,4 +1,4 @@
-const [core,windowBuilder] = [require("../bin/core"), require("../domain/windowBuilder")];
+const [core,windowBuilder,fs,xlsx] = [require("../bin/core"), require("../domain/windowBuilder"), require("fs"), require("node-xlsx")];
 
 class DispatchTactics {
     constructor(electron) {
@@ -8,23 +8,56 @@ class DispatchTactics {
     }
 
     closeWindow() {
-      this.BrowserWindow.getFocusedWindow().hide();
+        this.BrowserWindow.getFocusedWindow().hide();
     }
 
     miniWindow() {
-      this.BrowserWindow.getFocusedWindow().minimize();
-    }
-
-    loginMate(param) {
-        core.userDir(param.id, err => {
-            core.configuer.encryption(param, `${core.getDataPath()}/pid`);
-            global.engineerWhite.mainFrameWindow.loadURL(`file://${__dirname}/../views/index.html`);
-        });
+        this.BrowserWindow.getFocusedWindow().minimize();
     }
 
     openFrameWindow(param) {
-      param.url = `file://${__dirname}/../views/frameWindow.html?loadUrl=${param.url}`;
-      windowBuilder.buildContextFrameWindow(param);
+        param.url = `file://${__dirname}/../views/frameWindow.html`;
+        windowBuilder.buildContextFrameWindow(param);
+    }
+
+    openFileDialog(param) {
+        let filePath = this.dialog.showOpenDialog({
+            properties: ['openFile'],
+            filters: [
+                {name: 'Execl 2007', extensions: ['xlsx']}
+            ]
+        });
+        if (filePath) {
+            param.filePath = filePath[0];
+            this.uploadDatabases(param);
+        }
+    }
+
+    uploadDatabases(param) {
+        let data = xlsx.parse(param.filePath), databases = new Object();
+        for (let table of data) {
+            let classObject = new Object(), datas = table.data, dataItem, tableMap;
+            datas.forEach((item, index) => {
+                if (!dataItem) {
+                    tableMap = new Object(); // 构建表
+                    //databases.set(table.name, tableMap); // 将表添加到数据库中
+                    databases[table.name] = tableMap;
+                }
+                if (0 === index) {
+                    item.forEach(value => {
+                        classObject[value] = null; // 构建表的schema
+                    });
+                } else {
+                    dataItem = new Object();
+                    Object.keys(classObject).forEach((key, value) => {
+                        dataItem[key] = item[value]; // 将零散的数据组成表数据
+                    });
+                    //tableMap.set(index, dataItem);  // 将数据写入到刚刚构建的表中
+                    tableMap[index] = dataItem;
+                }
+            });
+        }
+        core.writeData(JSON.stringify(databases),`${__dirname}/../databases/gree.db`);
     }
 }
 
