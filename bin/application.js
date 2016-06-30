@@ -12,10 +12,10 @@ module.exports = electron => {
 
     let readyApp = () => {
         let {screen : electronScreen} = electron, {width,height} = electronScreen.getPrimaryDisplay().workAreaSize;
-        windowBuilder.initFrameWindow(width,height);
+        windowBuilder.initFrameWindow(width,height); // 加载windows builder 构建窗体
         windowBuilder.buildMainFrameWindow();
         global.appIcon = new Tray(global.engineerWhite.icon);
-        require(`${__dirname}/../domain/trayBuilder`)(electron);
+        require(`${__dirname}/../domain/trayBuilder`)(electron); // 加载托盘 builder
     };
 
     app.on("ready", readyApp);

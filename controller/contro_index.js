@@ -3,7 +3,7 @@ const [core, angularBoots, utilContr] = [require("../bin/core"), require("angula
 let app = angular.module('indexApp', ['ui.bootstrap']).controller('indexCtrl', $scope => {
 
   require(`${__dirname}/../controller/contro_common`)($scope);
-  $scope.index_flowAdd = "欢迎使用小美";
+  $scope.index_flowAdd = "欢迎使用TRU mate";
   /**
    * 日历控件
    */
