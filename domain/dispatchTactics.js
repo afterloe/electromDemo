@@ -16,7 +16,8 @@ class DispatchTactics {
     }
 
     openFrameWindow(param) {
-        param.url = `file://${__dirname}/../views/frameWindow.html`;
+        if(!param.url)
+            param.url = `file://${__dirname}/../views/frameWindow.html`;
         windowBuilder.buildContextFrameWindow(param);
     }
 

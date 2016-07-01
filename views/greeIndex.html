@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="GreeApp" ng-controller="GreeCtrl">
+<head>
+    <meta charset="UTF-8">
+    <title>配送选型DEMO</title>
+    <link rel="stylesheet" href="../sources/stylesheets/lib/tBootstrap.min.css">
+    <link rel="stylesheet" href="../sources/stylesheets/base.css">
+    <link rel="stylesheet" href="../sources/stylesheets/frameWindow.css">
+    <script src="../sources/javascripts/lib/angular.min.js"></script>
+    <script src="../sources/javascripts/lib/ui-bootstrap-tpls-1.3.3.min.js"></script>
+    <style type="text/css">
+        .dropDomain {
+            padding: 10px;
+            border: 1px solid #aaaaaa;
+            margin: 15px 0px 0px 50px;
+        }
+
+        .row {
+            margin-right: 0px;
+            margin-left: 0px;
+        }
+    </style>
+</head>
+<body>
+<!-- #include virtual = "../views/public/head.html" -->
+<div ng-include="'../views/public/head.html'"></div>
+<!-- 导航 -->
+<div class="row">
+    <ul class="nav nav-tabs nav-justified">
+        <li class="active"><a href="#">选择装备方案</a></li>
+        <li><a>选择风机</a></li>
+        <li><a>选择螺旋</a></li>
+        <li><a>选择外壳</a></li>
+    </ul>
+    <uib-progressbar class="progress-striped active" value="dynamic" type="success">{{dynamic}}% <i ng-show="showWarning">wait input</i></uib-progressbar>
+</div>
+
+<div></div>
+<br/>
+
+<script type="text/javascript" src="../controller/contro_greeApp.js"></script>
+</body>
+</html>

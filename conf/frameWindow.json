@@ -8,7 +8,7 @@
     "movable" : false,
     "alwaysOnTop" : true,
     "frame" : false,
-    "title" : "Engineer White",
+    "title" : "TRU Engineer White",
     "icon" : "applogo.ico",
     "useContentSize" : true,
     "scrollBounce" : true,
@@ -20,7 +20,7 @@
     "height" : "auto",
     "frame" : false,
     "resizable" : false,
-    "title" : "Engineer White - ",
+    "title" : "TRU Engineer White - ",
     "useContentSize" : true,
     "darkTheme" : true,
     "debug" : true

@@ -6,8 +6,13 @@
 .indexApp_context .row {
   margin-top: 3%;
 }
-.irecommendApp {
-  height: 350px;
+
+.carouselImg {
+  max-height: 230px;
+}
+
+.recommendApp {
+  height: 230px;
 }
 
 .carouselImg {
