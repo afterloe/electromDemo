@@ -1,9 +1,23 @@
 /**
+ * 拓展Object的values方法
+ *
+ * @param jsonObject
+ * @returns {Array}
+ */
+Object.prototype.values = jsonObject => {
+    let values = new Array();
+    Object.keys(jsonObject).forEach(item => {
+        values.push(jsonObject[item]);
+    });
+    return values;
+};
+
+/**
  * Created by afterloe on 16-1-7.
  */
 const [fs,uuid,dBug,dataPath] = [require("fs"), require('node-uuid'), true, `${process.env.APPDATA}/EngineeringWhite`];
 
-let [userDir,readVersionInfo,deleteFile,uploadMateSite,updateLoinInfos,postFiles,randomCode,readUserInfo,vers,result,writeJournal,getTime,formatDate,getDataPath,writeData] = [
+let [userDir,readVersionInfo,deleteFile,uploadMateSite,updateLoinInfos,postFiles,randomCode,readUserInfo,vers,result,writeJournal,getTime,formatDate,getDataPath,writeData,getDateBase] = [
 /**
  * userDir
  *
@@ -278,6 +292,23 @@ let [userDir,readVersionInfo,deleteFile,uploadMateSite,updateLoinInfos,postFiles
             configuer.encryption(data, path);
         else
             fs.writeFileSync(path, data);
+    },
+/**
+ * getDateBase
+ *
+ * 获取databse中的数据
+ */
+    (dbPath = `${__dirname}/../databases/gree.db`) => {
+        let db = new Map(),ret;
+        ret = JSON.parse(this.readJson(dbPath));
+        Object.keys(ret).forEach(tableName => {
+            let table = new Map();
+            Object.values(ret[tableName]).forEach((item,sequence) => {
+                table.set(sequence,item);
+            });
+            db.set(tableName,table);
+        });
+        return db;
     }
 ];
 
@@ -310,6 +341,8 @@ module.exports.formatDate = formatDate;
 module.exports.getDataPath = getDataPath;
 
 module.exports.writeData = writeData;
+
+module.exports.getDateBase = getDateBase;
 
 var hexcase = 0, b64pad = "", chrsz = 8;
 module.exports.hex_md5 = function (b) {
