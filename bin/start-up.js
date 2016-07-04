@@ -6,5 +6,10 @@
  */
 const electron = require("electron");
 
-// ¼ÓÔØÖ÷Ó¦ÓÃÄ£¿é
+// åŠ è½½ä¸»åº”ç”¨æ¨¡å—
 require(`${__dirname}/application`)(electron);
+
+// æŠ“å–æœªå¤„ç†çš„å¼‚å¸¸
+process.on('uncaughtException',err => {
+    console.log(err);
+});
