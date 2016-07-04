@@ -58,7 +58,7 @@ class DispatchTactics {
                 }
             });
         }
-        core.writeData(JSON.stringify(databases),`${__dirname}/../databases/gree.db`);
+        core.writeData(databases,`${__dirname}/../databases/gree.db`);
     }
 }
 

@@ -10,61 +10,83 @@
 
     <script src="../sources/javascripts/lib/angular.min.js"></script>
     <script src="../sources/javascripts/lib/ui-bootstrap-tpls-1.3.3.min.js"></script>
+
+    <script type="text/ng-template" id="myModalContent.html">
+        <div class="modal-header">
+            <h3 class="modal-title">I'm a modal!</h3>
+        </div>
+        <div class="modal-body">
+            <ul>
+                <li ng-repeat="item in items">
+                    <a href="#" ng-click="$event.preventDefault(); selected.item = item">{{ item }}</a>
+                </li>
+            </ul>
+            Selected: <b>{{ selected.item }}</b>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+            <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+        </div>
+    </script>
+
 </head>
 <body>
 <!-- #include virtual = "../views/public/head.html" 引入控制窗口头 -->
 <div ng-include="'../views/public/head.html'"></div>
 
 <!-- 选型步骤导航 -->
-<div class="row">
-    <ul class="nav nav-tabs nav-justified">
-        <li class="active"><a>选择装备方案</a></li>
-        <li><a>选择风机</a></li>
-        <li><a>选择螺旋</a></li>
-        <li><a>选择外壳</a></li>
-    </ul>
-    <!-- 进度条 -->
-    <uib-progressbar class="progress-striped active" value="dynamic" type="success">{{dynamic}}% <i
-            ng-show="showWarning">wait input</i></uib-progressbar>
-</div>
-
+<ul class="nav nav-tabs nav-justified">
+    <li class="active"><a>选择装备方案</a></li>
+    <li><a>选择风机</a></li>
+    <li><a>选择螺旋</a></li>
+    <li><a>选择外壳</a></li>
+</ul>
+<!-- 进度条 -->
+<uib-progressbar class="progress-striped active" value="dynamic" type="success">{{dynamic}}% <i
+        ng-show="showWarning">wait input</i></uib-progressbar>
 <div class="container">
-    <!-- 配置选型方式页面 -->
-    <div>
+    <div class="row">
         <div class="row">
-            <div id="systemOrder" class="col-md-5 dropDomain" ondrop="drop(event,'source')" ondragover="allowDrop(event)" electron-drop="source">
-                <h3>系统控件<span class="badge">{{dbCommandsNumber}}</span>
-                    <small>选择需要的控件拖动到右边</small>
-                </h3>
-                <div ng-repeat="command in commands">
-                    <div draggable="true" ondragstart="drag(event)" id="{{command.id}}" class="electron-item">
-                        <div class="form-group">
-                            <label class="dropPrompt">{{command.name}}</label>
-                            <ng-bind-html ng-bind-html="TrustDangerousSnippet(command.innerHtml)"></ng-bind-html>
+            <div class="col-md-6">
+                <div id="systemOrder" class="dropDomain" ondrop="drop(event,'source')" ondragover="allowDrop(event)"
+                     electron-drop="source">
+                    <h3>系统控件<span class="badge">{{dbCommandsNumber}}</span>
+                        <small>选择需要的控件拖动到右边</small>
+                    </h3>
+                    <div ng-repeat="command in commands">
+                        <div draggable="true" ondragstart="drag(event)" id="{{command.id}}" class="electron-item">
+                            <div class="form-group">
+                                <label class="dropPrompt">{{command.name}}</label>
+                                <ng-bind-html ng-bind-html="TrustDangerousSnippet(command.innerHtml)"></ng-bind-html>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <div class="col-md-5 col-md-offset-4">
+                    <button type="button" class="btn btn-info" ng-click="selectFile()"><span
+                            class="glyphicon glyphicon-link"></span> 载入库
+                    </button>
+                    <button type="button" class="btn btn-primary" ng-click="updateDB()"><span
+                            class="glyphicon glyphicon-refresh"></span> 刷新库
+                    </button>
+                </div>
             </div>
-            <div id="newSelectOrder" class="col-md-5 dropDomain" ondrop="drop(event,'tag')" ondragover="allowDrop(event)" electron-drop="tag">
-                <select class="form-control" ng-model="configurationPlan.selected" ng-options="o as o for o in configurationPlan.options"></select>
-                <ng-bind-html ng-bind-html="ConfigurationPlanSnippet(configurationPlan.selected)"></ng-bind-html>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-2"></div>
-            <div class="col-md-3">
-                <button type="button" class="btn btn-info" ng-click="selectFile()"><span
-                        class="glyphicon glyphicon-link"></span> 载入库
-                </button>
-                <button type="button" class="btn btn-primary" ng-click="updateDB()"><span
-                        class="glyphicon glyphicon-refresh"></span> 刷新库
-                </button>
-            </div>
-            <div class="col-md-3"></div>
-            <div class="col-md-3">
-                <button type="button" class="btn btn-default" ng-click="resetNewSelectOrder()"><span class="glyphicon glyphicon-repeat"></span> 重置
-                </button>
-                <button type="button" class="btn btn-success"><span class="glyphicon glyphicon-ok"></span> 应用</button>
+            <div class="col-md-6">
+                <div id="newSelectOrder" class="dropDomain" ondrop="drop(event,'tag')" ondragover="allowDrop(event)"
+                     electron-drop="tag">
+                    <select class="form-control" ng-model="configurationPlan.selected"
+                            ng-options="o as o for o in configurationPlan.options" ng-change="loadPlain(configurationPlan.selected)"></select>
+                    <ng-bind-html ng-bind-html="TrustDangerousSnippet(assemblyPlain)"></ng-bind-html>
+                </div>
+                <div class="col-md-4 col-md-offset-5">
+                    <button type="button" class="btn btn-default" ng-click="resetNewSelectOrder()" ng-disabled="!btn_create"><span
+                            class="glyphicon glyphicon-repeat"></span> 重置
+                    </button>
+                    <button type="button" class="btn btn-danger" ng-click="saveConfigurationPlan()" ng-hide="!btn_create"><span class="glyphicon glyphicon-floppy-saved"></span> 保存
+                    </button>
+                    <button type="button" class="btn btn-success" ng-hide="!btn_select" ng-disabled="!btn_create"><span class="glyphicon glyphicon-ok"></span> 应用
+                    </button>
+                </div>
             </div>
         </div>
     </div>

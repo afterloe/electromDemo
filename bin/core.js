@@ -299,8 +299,8 @@ let [userDir,readVersionInfo,deleteFile,uploadMateSite,updateLoinInfos,postFiles
  * 获取databse中的数据
  */
     (dbPath = `${__dirname}/../databases/gree.db`) => {
-        let db = new Map(),ret;
-        ret = JSON.parse(this.readJson(dbPath));
+        let db = new Map(),ret = this.readJson(dbPath);
+        if(!ret) return db;
         Object.keys(ret).forEach(tableName => {
             let table = new Map();
             Object.values(ret[tableName]).forEach((item,sequence) => {
