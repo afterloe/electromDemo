@@ -34,20 +34,32 @@
 
 <!-- 选型步骤导航 -->
 <ul class="nav nav-tabs nav-justified">
-    <li class="active"><a>选择装备方案</a></li>
-    <li><a>选型</a></li>
-    <li><a>风机部件</a></li>
-    <li><a>电器盒部件</a></li>
-    <li><a>蒸发器部件</a></li>
-    <li><a>总清单</a></li>
+    <li ng-class="{'active': !selectPlan}"><a ng-click="selectTab(1)">选择装备方案</a></li>
+    <li ng-class="{'active': !selectCase}"><a ng-click="selectTab(2)">壳体</a></li>
+    <li ng-class="{'active': !selectBlower}"><a ng-click="selectTab(3)">风机部件</a></li>
+    <li ng-class="{'active': !selectElectricalBox}"><a ng-click="selectTab(4)">电器盒部件</a></li>
+    <li ng-class="{'active': !selectEvaporator}"><a ng-click="selectTab(5)">蒸发器部件</a></li>
+    <li ng-class="{'active': !optionalList}"><a ng-click="selectTab(6)">总清单</a></li>
 </ul>
 <!-- 进度条 -->
 <uib-progressbar class="progress-striped active" value="dynamic" type="success">{{dynamic}}% <i
         ng-show="showWarning">wait input</i></uib-progressbar>
 
 <div class="container">
-    <!-- 第一个TabPanel -->
-    <div class="row">
+    <!-- TabPanel: 总清单 -->
+    <div class="row" ng-hide="optionalList" ng-controller="optionalListCtr"></div>
+    <!-- TabPanel: 蒸发器部件 -->
+    <div class="row" ng-hide="selectEvaporator" ng-controller="selectEvaporatorCtr"></div>
+    <!-- TabPanel: 电器盒部件 -->
+    <div class="row" ng-hide="selectElectricalBox" ng-controller="selectElectricalBoxCtr"></div>
+    <!-- TabPanel: 风机部件 -->
+    <div class="row" ng-hide="selectBlower" ng-controller="selectBlowerCtr"></div>
+    <!-- TabPanel: 壳体 -->
+    <div class="row" ng-hide="selectCase" ng-controller="selectCaseCtr">
+
+    </div>
+    <!-- TabPanel: 选择装备方案 -->
+    <div class="row" ng-hide="selectPlan" ng-controller="selectPlanCtr">
         <div class="row">
             <div class="col-md-6">
                 <div id="systemOrder" class="dropDomain" ondrop="drop(event,'source')" ondragover="allowDrop(event)"
@@ -95,7 +107,7 @@
                     <button type="button" class="btn btn-danger" ng-click="saveConfigurationPlan()" ng-hide="!btn_save">
                         <span class="glyphicon glyphicon-floppy-saved"></span> 保存
                     </button>
-                    <button type="button" class="btn btn-success" ng-hide="!btn_select"><span
+                    <button type="button" class="btn btn-success" ng-hide="!btn_select" ng-click="nextStep(configurationPlan.selected)"><span
                             class="glyphicon glyphicon-ok"></span> 应用
                     </button>
                 </div>
