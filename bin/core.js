@@ -1,18 +1,4 @@
 /**
- * 拓展Object的values方法
- *
- * @param jsonObject
- * @returns {Array}
- */
-Object.prototype.values = jsonObject => {
-    let values = new Array();
-    Object.keys(jsonObject).forEach(item => {
-        values.push(jsonObject[item]);
-    });
-    return values;
-};
-
-/**
  * Created by afterloe on 16-1-7.
  */
 const [fs,uuid,dBug,dataPath] = [require("fs"), require('node-uuid'), true, `${process.env.APPDATA}/EngineeringWhite`];
@@ -299,14 +285,14 @@ let [userDir,readVersionInfo,deleteFile,uploadMateSite,updateLoinInfos,postFiles
  * 获取databse中的数据
  */
     (dbPath = `${__dirname}/../databases/gree.db`) => {
-        let db = new Map(),ret = this.readJson(dbPath);
-        if(!ret) return db;
+        let db = new Map(), ret = this.readJson(dbPath);
+        if (!ret) return db;
         Object.keys(ret).forEach(tableName => {
             let table = new Map();
-            Object.values(ret[tableName]).forEach((item,sequence) => {
-                table.set(sequence,item);
+            this.values(ret[tableName]).forEach((item, sequence) => {
+                table.set(sequence, item);
             });
-            db.set(tableName,table);
+            db.set(tableName, table);
         });
         return db;
     }
@@ -373,6 +359,14 @@ module.exports.readJson = (path, flag) => {
             return JSON.parse(readBytes);
         }
     }
+};
+
+module.exports.values = jsonObject => {
+    let values = new Array();
+    Object.keys(jsonObject).forEach(item => {
+        values.push(jsonObject[item]);
+    });
+    return values;
 };
 
 function b64_md5(b) {
