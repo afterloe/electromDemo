@@ -11,9 +11,6 @@ let db = core.getDateBase(), planDB = core.readJson(`${__dirname}/../databases/p
 let init = $scope => {
     $scope.selectPlan = false;
     $scope.selectCase = true;
-    $scope.selectBlower = true;
-    $scope.selectElectricalBox = true;
-    $scope.selectEvaporator = true;
     $scope.optionalList = true;
 };
 
@@ -27,9 +24,9 @@ let drop = (ev, flag) => {
     flag = "tag" === flag;
     if (flag) {
         command.removeAttribute("disabled");
-        newItem.push(tagDom);
+        newItem.push({data, tagDom: tagDom.innerHTML});
     } else {
-        let index = newItem.findIndex(item => item == tagDom);
+        let index = newItem.findIndex(item => item.data === data);
         if (index > -1) newItem.splice(index, 1);
         command.setAttribute("disabled", "disabled");
     }
@@ -45,26 +42,17 @@ let selectPlan = function (tabNumber) {
         case 1 :
             this.selectPlan = false;
             this.selectCase = true;
-            this.selectBlower = true;
-            this.selectElectricalBox = true;
-            this.selectEvaporator = true;
             this.optionalList = true;
             break;
         case 2 :
             this.selectPlan = true;
             this.selectCase = false;
-            this.selectBlower = true;
-            this.selectElectricalBox = true;
-            this.selectEvaporator = true;
             this.optionalList = true;
             break;
         case 3 :
             this.selectPlan = true;
             this.selectCase = true;
-            this.selectBlower = false;
-            this.selectElectricalBox = true;
-            this.selectEvaporator = true;
-            this.optionalList = true;
+            this.optionalList = false;
             break;
         case 4 :
             this.selectPlan = true;
@@ -93,31 +81,41 @@ let selectPlan = function (tabNumber) {
     }
 };
 
-let buildCommand = () => {
+let buildCommands = (condition) => {
     let commandArr = new Array(), command;
-    for (let [tableName,table] of db.entries()) {
-        command = new Object();
-        command.id = tableName;
-        command.name = tableName;
-        command.innerHtml = buildSelect(table, tableName);
-        commandArr.push(command);
+    if (condition) {
+        for (let cond of condition) {
+            for (let [tableName,table] of db.entries()) {
+                if (cond !== tableName) continue;
+                command = new Object();
+                command.id = tableName;
+                command.key = tableName;
+                command.name = tableName;
+                command.options = assemblyCommands(table);
+                commandArr.push(command);
+            }
+        }
+    } else {
+        for (let [tableName,table] of db.entries()) {
+            command = new Object();
+            command.id = tableName;
+            command.key = tableName;
+            command.name = tableName;
+            command.options = assemblyCommands(table);
+            commandArr.push(command);
+        }
     }
     return commandArr;
 };
 
-let buildSelect = (item, tableName) => {
-    let innerHtml = `<select class="form-control tagSelect" disabled="disabled" ng-model="${tableName}">`, flag = true;
+let assemblyCommands = item => {
+    let options = new Array();
     for (let value of item.values()) {
-        value = core.values(value).join(",");
-        if (flag) {
-            flag = false;
-            innerHtml += `<option label="${value}" value="${value}" selected="selected">${value}</option>`;
-        }
-        else
-            innerHtml += `<option label="${value}" value="${value}">${value}</option>`;
+        options.push(core.values(value));
     }
-    innerHtml += `</select>`;
-    return innerHtml;
+    return {
+        options, selected: options[0]
+    };
 };
 
 let openFile = () => {
@@ -134,36 +132,88 @@ let readConfigPlan = () => {
     return planDB;
 };
 
+let buildOrderList = (arr,$sce) => {
+    let innerHtml = "";
+    //arr.forEach();
+    //for(let type of arr){
+    //    innerHtml += `<h4><span class="label label-default">电机编码</span>
+    //                        <small class="pull-right">15709408</small>
+    //                    </h4>`;
+    //}
+    return $sce.trustAsHtml(innerHtml);
+};
+
 let GreeApp = angular.module('GreeApp', ['ngAnimate', 'ui.bootstrap']);
 
-GreeApp.controller("optionalListCtr",['$scope', ($scope) => {
+GreeApp.controller("optionalListCtr", ['$scope','$rootScope','$selectPlain','$uibModal','$sce', ($scope,$rootScope,$selectPlain,$uibModal,$sce) => {
+    $scope.selectRandom = "userLogo.png";
+    $scope.planName = "请选型";
 
-}]);
+    $rootScope.$on("optionalList", () => {
+        $scope.selectPlan = false;
+        $scope.selectRandom = "小壳体.png";
+        $scope.planName = "格力大1p空调";
+        $scope.TrustDangerousSnippet = buildOrderList($selectPlain.getSelectPlan(),$sce);
+    });
 
-GreeApp.controller("selectEvaporatorCtr",['$scope', ($scope) => {
+    $scope.openPro = () => {
+        $uibModal.open({
+            animation: true,
+            templateUrl: 'alertMessage.html',
+            controller: 'altMsgCtr',
+            size: "sm",
+            resolve: {
+                message: {
+                    context : "正在打开PRO Engineer",
+                    title : "这里！"
+                }
+            }
+        });
+        //$scope.TrustDangerousSnippet = $sce.trustAsHtml("PROCESS OPEN PRO Engineer ...");
 
-}]);
+        utilContr.noticeMaster("openProEngineer");
+    };
 
-GreeApp.controller("selectElectricalBoxCtr",['$scope', ($scope) => {
-
-}]);
-
-GreeApp.controller("selectBlowerCtr",['$scope', ($scope) => {
-
+    $scope.break = num => {
+        $rootScope.$broadcast("backPlan");
+    };
 }]);
 
 /**
  * 壳体选择控制器
  */
-GreeApp.controller("selectCaseCtr",['$scope', '$rootScope', ($scope,$rootScope) => {
+GreeApp.controller("selectCaseCtr", ['$scope', '$rootScope', '$sce', '$selectPlain', ($scope, $rootScope, $sce, $selectPlain) => {
+    $scope.sourcePlan = true;
+    $scope.break = () => {
+        $rootScope.$broadcast("backPlan");
+    };
 
+    $scope.selectChange = dom => console.log(dom);
+
+    $scope.exportSelect = () => {
+        let solutionPlane = new Array();
+        for(let command of $scope.commands){
+            solutionPlane.push({
+                id : command.id,
+                selected : command.options.selected
+            });
+        }
+        $rootScope.$broadcast("nextPlan");
+        $selectPlain.setSelectPlan(solutionPlane);
+        $rootScope.$broadcast("optionalList");
+    };
+
+    $rootScope.$on("loadPlanInSelection", () => {
+        $scope.sourcePlan = false;
+        $scope.commands = buildCommands($selectPlain.getPlan());
+    });
 }]);
 
 /**
  * 选择配置方案 控制器
  */
-GreeApp.controller("selectPlanCtr",['$scope','$sce','$uibModal','$log', ($scope,$sce,$uibModal,$log) => {
-    $scope.commands = buildCommand();
+GreeApp.controller("selectPlanCtr", ['$scope', '$sce', '$uibModal', '$log', '$rootScope', '$selectPlain', ($scope, $sce, $uibModal, $log, $rootScope, $selectPlain) => {
+    $scope.commands = buildCommands();
 
     $scope.updateDB = () => {
         location.reload();
@@ -177,10 +227,13 @@ GreeApp.controller("selectPlanCtr",['$scope','$sce','$uibModal','$log', ($scope,
         let obj = core.readJson(`${__dirname}/../databases/${plainName}.plan`), innerHtml;
         $scope.assemblyPlain = '';
         if (obj) {
+            let commandList = new Array();
             innerHtml = ``;
             obj.forEach(command => {
-                innerHtml += command;
+                innerHtml += command.tagDom;
+                commandList.push(command.data);
             });
+            $selectPlain.setPlan(commandList);
             $scope.btn_select = true;
             $scope.btn_save = false;
             $scope.assemblyPlain = innerHtml;
@@ -213,33 +266,63 @@ GreeApp.controller("selectPlanCtr",['$scope','$sce','$uibModal','$log', ($scope,
         });
 
         modalInstance.result.then(planName => {
-            let plain = new Array();
-            newItem.forEach(item => plain.push(item.innerHTML));
-            core.writeData(plain, `${__dirname}/../databases/${planName}.plan`);
+            core.writeData(newItem, `${__dirname}/../databases/${planName}.plan`);
             planDB.push(planName);
-            plain = null;
             core.writeData(planDB, `${__dirname}/../databases/plan.json`);
+            $scope.btn_select = true;
+            $scope.btn_save = false;
         }, () => {
             $log.info('Modal dismissed at: ' + new Date());
         });
     };
 
     $scope.nextStep = planName => {
-        $scope.selectPlan = true;
-        $scope.selectCase = false;
+        $rootScope.$broadcast("nextPlan");
+        $rootScope.$broadcast("loadPlanInSelection");
     };
 }]);
+
+
+GreeApp.service('$selectPlain', function () {
+    let plan = '', selectPlan = '';
+    return {
+        getPlan: () => {
+            return plan;
+        },
+        setPlan: value => {
+            plan = value;
+        },
+        getSelectPlan : () => {
+            return selectPlan;
+        },
+        setSelectPlan : value => {
+            selectPlan = value;
+        }
+    };
+});
 
 /**
  * 主页控制器
  */
-GreeApp.controller("GreeCtrl",['$scope', '$rootScope', ($scope,$rootScope) => {
+GreeApp.controller("GreeCtrl", ['$scope', '$rootScope', ($scope, $rootScope) => {
     require(`${__dirname}/../controller/contro_common`)($scope);
     init($scope);
+    $scope.planNumber = 1;
     $scope.selectTab = TabNum => {
+        $scope.planNumber = TabNum;
         selectPlan.apply($scope, [TabNum]);
     };
     $scope.dynamic = 0;
+
+    $rootScope.$on("nextPlan", () => {
+        $scope.planNumber++;
+        selectPlan.apply($scope, [$scope.planNumber]);
+    });
+
+    $rootScope.$on("backPlan", () => {
+        $scope.planNumber--;
+        selectPlan.apply($scope, [$scope.planNumber]);
+    });
 }]);
 
 /**
@@ -248,6 +331,18 @@ GreeApp.controller("GreeCtrl",['$scope', '$rootScope', ($scope,$rootScope) => {
 GreeApp.controller('ModalInstanceCtrl', ($scope, $uibModalInstance) => {
     $scope.ok = () => {
         $uibModalInstance.close($scope.planName);
+    };
+
+    $scope.cancel = () => {
+        $uibModalInstance.dismiss('cancel');
+    };
+});
+
+GreeApp.controller('altMsgCtr',($scope,$uibModalInstance,message) => {
+    $scope.messageTitle = message.title;
+    $scope.messageContext = message.context;
+    $scope.ok = () => {
+        $uibModalInstance.close();
     };
 
     $scope.cancel = () => {

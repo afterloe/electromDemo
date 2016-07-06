@@ -13,3 +13,7 @@
 .dropPrompt {
     cursor: pointer;
 }
+
+.thumbnail > img {
+    max-height: 280px;
+}

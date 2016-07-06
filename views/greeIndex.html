@@ -27,6 +27,42 @@
             <button class="btn btn-warning" type="button" ng-click="cancel()">取消</button>
         </div>
     </script>
+
+    <script type="text/ng-template" id="alertMessage.html">
+        <div class="modal-header">
+            <h3 class="modal-title">{{messageTitle}}</h3>
+        </div>
+        <div class="modal-body">
+            {{messageContext}}
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="button" ng-click="ok()">确认</button>
+            <button class="btn btn-warning" type="button" ng-click="cancel()">取消</button>
+        </div>
+    </script>
+
+    <script type="text/ng-template" id="commandDrag.html">
+        <ng-repeat ng-repeat="command in commands">
+            <div draggable="true" ondragstart="drag(event)" id="{{command.id}}" class="electron-item">
+                <div class="form-group">
+                    <label class="dropPrompt">{{command.name}}</label>
+                    <select class="form-control tagSelect" ng-model="command.options.selected"
+                            ng-options="o as o for o in command.options.options" disabled="disabled"></select>
+                </div>
+            </div>
+        </ng-repeat>
+    </script>
+
+    <script type="text/ng-template" id="command.html">
+        <ng-repeat ng-repeat="command in commands">
+            <div class="form-group">
+                <label class="dropPrompt">{{command.name}}</label>
+                <select class="form-control" ng-model="command.options.selected"
+                        ng-options="o as o for o in command.options.options"></select>
+            </div>
+        </ng-repeat>
+    </script>
+
 </head>
 <body>
 <!-- #include virtual = "../views/public/head.html" 引入控制窗口头 -->
@@ -35,11 +71,11 @@
 <!-- 选型步骤导航 -->
 <ul class="nav nav-tabs nav-justified">
     <li ng-class="{'active': !selectPlan}"><a ng-click="selectTab(1)">选择装备方案</a></li>
-    <li ng-class="{'active': !selectCase}"><a ng-click="selectTab(2)">壳体</a></li>
-    <li ng-class="{'active': !selectBlower}"><a ng-click="selectTab(3)">风机部件</a></li>
-    <li ng-class="{'active': !selectElectricalBox}"><a ng-click="selectTab(4)">电器盒部件</a></li>
-    <li ng-class="{'active': !selectEvaporator}"><a ng-click="selectTab(5)">蒸发器部件</a></li>
-    <li ng-class="{'active': !optionalList}"><a ng-click="selectTab(6)">总清单</a></li>
+    <li ng-class="{'active': !selectCase}"><a ng-click="selectTab(2)">配置单</a></li>
+    <!--<li ng-class="{'active': !selectBlower}"><a ng-click="selectTab(3)">风机部件</a></li>-->
+    <!--<li ng-class="{'active': !selectElectricalBox}"><a ng-click="selectTab(4)">电器盒部件</a></li>-->
+    <!--<li ng-class="{'active': !selectEvaporator}"><a ng-click="selectTab(5)">蒸发器部件</a></li>-->
+    <li ng-class="{'active': !optionalList}"><a ng-click="selectTab(3)">总清单</a></li>
 </ul>
 <!-- 进度条 -->
 <uib-progressbar class="progress-striped active" value="dynamic" type="success">{{dynamic}}% <i
@@ -47,68 +83,47 @@
 
 <div class="container">
     <!-- TabPanel: 总清单 -->
-    <div class="row" ng-hide="optionalList" ng-controller="optionalListCtr"></div>
-    <!-- TabPanel: 蒸发器部件 -->
-    <div class="row" ng-hide="selectEvaporator" ng-controller="selectEvaporatorCtr"></div>
-    <!-- TabPanel: 电器盒部件 -->
-    <div class="row" ng-hide="selectElectricalBox" ng-controller="selectElectricalBoxCtr"></div>
-    <!-- TabPanel: 风机部件 -->
-    <div class="row" ng-hide="selectBlower" ng-controller="selectBlowerCtr"></div>
-    <!-- TabPanel: 壳体 -->
-    <div class="row" ng-hide="selectCase" ng-controller="selectCaseCtr">
+    <div class="row" ng-hide="optionalList" ng-controller="optionalListCtr">
         <div class="row">
-            <div class="col-sm-6 col-md-4">
+            <div class="col-md-10">
                 <div class="thumbnail">
-                    <img data-src="holder.js/300x200" alt="...">
+                    <img src="../sources/{{selectRandom}}" alt="请选择壳体相关数据!">
+
                     <div class="caption">
-                        <h3>Thumbnail label</h3>
-                        <p>...</p>
-                        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-md-4">
-                <div class="thumbnail">
-                    <img data-src="holder.js/300x200" alt="...">
-                    <div class="caption">
-                        <h3>Thumbnail label</h3>
-                        <p>...</p>
-                        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-md-4">
-                <div class="thumbnail">
-                    <img data-src="holder.js/300x200" alt="...">
-                    <div class="caption">
-                        <h3>Thumbnail label</h3>
-                        <p>...</p>
-                        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-md-4">
-                <div class="thumbnail">
-                    <img data-src="holder.js/300x200" alt="...">
-                    <div class="caption">
-                        <h3>Thumbnail label</h3>
-                        <p>...</p>
-                        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-md-4">
-                <div class="thumbnail">
-                    <img data-src="holder.js/300x200" alt="...">
-                    <div class="caption">
-                        <h3>Thumbnail label</h3>
-                        <p>...</p>
-                        <p><a href="#" class="btn btn-primary" role="button">Button</a> <a href="#" class="btn btn-default" role="button">Button</a></p>
+                        <h3>{{planName}}</h3>
+
+                        <p>
+                            <ng-bind-html ng-bind-html="TrustDangerousSnippet"></ng-bind-html>
+                        </p>
+                        <p>
+                            <a href="#" class="btn btn-primary pull-right" role="button" ng-click="openPro()"
+                               ng-disabled="selectPlan"><span
+                                    class="glyphicon glyphicon-link"></span> 打开Pro/Engineer</a>&nbsp;
+                            <a href="#" class="btn btn-default pull-right" role="button" ng-click="break(2)"
+                               ng-disabled="selectPlan"><span
+                                    class="glyphicon glyphicon-trash"></span> 重新选型</a>
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- TabPanel: 壳体 -->
+    <div class="row" ng-hide="selectCase" ng-controller="selectCaseCtr">
+        <div class="col-md-8" ng-include src="'command.html'"></div>
+        <div class="row">
+            <div class="col-md-6 col-md-offset-5">
+                <button type="button" class="btn btn-danger" ng-disabled="sourcePlan" ng-click="break(1)">
+                    <span class="glyphicon glyphicon-chevron-left"></span> 返回
+                </button>
+                <button type="button" class="btn btn-success" ng-disabled="sourcePlan" ng-click="exportSelect()"><span
+                        class="glyphicon glyphicon-export"></span> 确认选型
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- TabPanel: 选择装备方案 -->
     <div class="row" ng-hide="selectPlan" ng-controller="selectPlanCtr">
         <div class="row">
@@ -118,14 +133,7 @@
                     <h3>系统控件<span class="badge">{{dbCommandsNumber}}</span>
                         <small>选择需要的控件拖动到右边</small>
                     </h3>
-                    <div ng-repeat="command in commands">
-                        <div draggable="true" ondragstart="drag(event)" id="{{command.id}}" class="electron-item">
-                            <div class="form-group">
-                                <label class="dropPrompt">{{command.name}}</label>
-                                <ng-bind-html ng-bind-html="TrustDangerousSnippet(command.innerHtml)"></ng-bind-html>
-                            </div>
-                        </div>
-                    </div>
+                    <div ng-include src="'commandDrag.html'"></div>
                 </div>
                 <div class="col-md-6 col-md-offset-2">
                     <button type="button" class="btn btn-info" ng-click="selectFile()"><span
@@ -142,9 +150,11 @@
                     <form class="form-horizontal" role="form">
                         <div class="form-group">
                             <label class="col-sm-3 control-label">选择方案<span class="badge">{{planNumber}}</span></label>
+
                             <div class="col-sm-8">
                                 <select class="form-control" ng-model="configurationPlan.selected"
-                                        ng-options="o as o for o in configurationPlan.options" ng-change="loadPlain(configurationPlan.selected)"></select>
+                                        ng-options="o as o for o in configurationPlan.options"
+                                        ng-change="loadPlain(configurationPlan.selected)"></select>
                             </div>
                         </div>
                     </form>
@@ -158,7 +168,8 @@
                     <button type="button" class="btn btn-danger" ng-click="saveConfigurationPlan()" ng-hide="!btn_save">
                         <span class="glyphicon glyphicon-floppy-saved"></span> 保存
                     </button>
-                    <button type="button" class="btn btn-success" ng-hide="!btn_select" ng-click="nextStep(configurationPlan.selected)"><span
+                    <button type="button" class="btn btn-success" ng-hide="!btn_select"
+                            ng-click="nextStep(configurationPlan.selected)"><span
                             class="glyphicon glyphicon-ok"></span> 应用
                     </button>
                 </div>
