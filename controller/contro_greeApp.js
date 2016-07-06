@@ -5,7 +5,7 @@
  * @version 1.0.0
  */
 const [core, utilContr] = [require("../bin/core"), require("../bin/util")];
-
+const colorTag = ['label-default','label-primary','label-success','label-info','label-warning','label-danger'];
 let db = core.getDateBase(), planDB = core.readJson(`${__dirname}/../databases/plan.json`), newItem = new Array();
 
 let init = $scope => {
@@ -26,7 +26,7 @@ let drop = (ev, flag) => {
         command.removeAttribute("disabled");
         newItem.push({data, tagDom: tagDom.innerHTML});
     } else {
-        let index = newItem.findIndex(item => item.data === data);
+        let index = newItem.findIndex(item => item.data == data);
         if (index > -1) newItem.splice(index, 1);
         command.setAttribute("disabled", "disabled");
     }
@@ -132,15 +132,26 @@ let readConfigPlan = () => {
     return planDB;
 };
 
-let buildOrderList = (arr,$sce) => {
-    let innerHtml = "";
-    //arr.forEach();
-    //for(let type of arr){
-    //    innerHtml += `<h4><span class="label label-default">电机编码</span>
-    //                        <small class="pull-right">15709408</small>
-    //                    </h4>`;
-    //}
+let buildOrderList = (arr,$sce,$scope) => {
+    let innerHtml = "", sequence = 0, max_sequence = colorTag.length - 1, value;
+    for(let type of arr){
+        value = type.selected.join(" ");
+        innerHtml += `<h4><span class="label ${colorTag[sequence]}">${type.id}</span>
+                            <small class="pull-right">${value}</small>
+                        </h4>`;
+        if("能力" == type.id) selectPic(value,$scope);
+        sequence == max_sequence ? sequence = 0 : sequence++;
+    }
     return $sce.trustAsHtml(innerHtml);
+};
+
+let selectPic = (value,$scope) => {
+    if("12K" == value)
+        $scope.selectRandom = "小壳体.png";
+    else if("24K" == value)
+        $scope.selectRandom = "中壳体.png";
+    else
+        $scope.selectRandom = "大壳体.png";
 };
 
 let GreeApp = angular.module('GreeApp', ['ngAnimate', 'ui.bootstrap']);
@@ -151,9 +162,8 @@ GreeApp.controller("optionalListCtr", ['$scope','$rootScope','$selectPlain','$ui
 
     $rootScope.$on("optionalList", () => {
         $scope.selectPlan = false;
-        $scope.selectRandom = "小壳体.png";
-        $scope.planName = "格力大1p空调";
-        $scope.TrustDangerousSnippet = buildOrderList($selectPlain.getSelectPlan(),$sce);
+        $scope.planName = $selectPlain.getPlanName();
+        $scope.TrustDangerousSnippet = buildOrderList($selectPlain.getSelectPlan(),$sce,$scope);
     });
 
     $scope.openPro = () => {
@@ -169,7 +179,6 @@ GreeApp.controller("optionalListCtr", ['$scope','$rootScope','$selectPlain','$ui
                 }
             }
         });
-        //$scope.TrustDangerousSnippet = $sce.trustAsHtml("PROCESS OPEN PRO Engineer ...");
 
         utilContr.noticeMaster("openProEngineer");
     };
@@ -233,6 +242,7 @@ GreeApp.controller("selectPlanCtr", ['$scope', '$sce', '$uibModal', '$log', '$ro
                 innerHtml += command.tagDom;
                 commandList.push(command.data);
             });
+            $selectPlain.setPlanName(plainName);
             $selectPlain.setPlan(commandList);
             $scope.btn_select = true;
             $scope.btn_save = false;
@@ -277,6 +287,8 @@ GreeApp.controller("selectPlanCtr", ['$scope', '$sce', '$uibModal', '$log', '$ro
     };
 
     $scope.nextStep = planName => {
+        // TODO
+        newItem = new Array();
         $rootScope.$broadcast("nextPlan");
         $rootScope.$broadcast("loadPlanInSelection");
     };
@@ -284,7 +296,7 @@ GreeApp.controller("selectPlanCtr", ['$scope', '$sce', '$uibModal', '$log', '$ro
 
 
 GreeApp.service('$selectPlain', function () {
-    let plan = '', selectPlan = '';
+    let plan = '', selectPlan = '', planName = '';
     return {
         getPlan: () => {
             return plan;
@@ -297,6 +309,12 @@ GreeApp.service('$selectPlain', function () {
         },
         setSelectPlan : value => {
             selectPlan = value;
+        },
+        getPlanName : () => {
+            return planName;
+        },
+        setPlanName : value => {
+            planName = value;
         }
     };
 });
