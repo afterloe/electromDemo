@@ -1,6 +1,6 @@
 const [core,windowBuilder,fs,xlsx,exec] = [require("../bin/core"), require("../domain/windowBuilder"), require("fs"), require("node-xlsx"),require('child_process').exec];
 
-const PRO_Engineer_BAT = "F:/my.bat";
+const PRO_Engineer_BAT = `${__dirname}/../databases/pro3.0.bat.lnk`;
 
 class DispatchTactics {
     constructor(electron) {

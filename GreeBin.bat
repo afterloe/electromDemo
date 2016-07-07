@@ -1,0 +1,1 @@
+node_modules\.npminstall\electron-prebuilt\1.2.5\electron-prebuilt\dist\electron.exe bin\start-up.js
