@@ -51,26 +51,11 @@ class DispatchTactics {
     uploadDatabases(param) {
         let data = xlsx.parse(param.filePath), databases = new Object();
         for (let table of data) {
-            let classObject = new Object(), datas = table.data, dataItem, tableMap;
-            datas.forEach((item, index) => {
-                if (!dataItem) {
-                    tableMap = new Object(); // 构建表
-                    //databases.set(table.name, tableMap); // 将表添加到数据库中
-                    databases[table.name] = tableMap;
-                }
-                if (0 === index) {
-                    item.forEach(value => {
-                        classObject[value] = null; // 构建表的schema
-                    });
-                } else {
-                    dataItem = new Object();
-                    Object.keys(classObject).forEach((key, value) => {
-                        dataItem[key] = item[value]; // 将零散的数据组成表数据
-                    });
-                    //tableMap.set(index, dataItem);  // 将数据写入到刚刚构建的表中
-                    tableMap[index] = dataItem;
-                }
-            });
+            if("condition" === table.name) {
+                databases[table.name] = core.constructionCondition(table);
+            } else {
+                databases[table.name] = core.constructionTable(table);
+            }
         }
         core.writeData(databases,`${__dirname}/../databases/gree.db`);
     }

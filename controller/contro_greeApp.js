@@ -5,7 +5,7 @@
  * @version 1.0.0
  */
 const [core, utilContr] = [require("../bin/core"), require("../bin/util")];
-const colorTag = ['label-default','label-primary','label-success','label-info','label-warning','label-danger'];
+const colorTag = ['label-default', 'label-primary', 'label-success', 'label-info', 'label-warning', 'label-danger'];
 let db = core.getDateBase(), planDB = core.readJson(`${__dirname}/../databases/plan.json`), newItem = new Array();
 
 let init = $scope => {
@@ -81,7 +81,7 @@ let selectPlan = function (tabNumber) {
     }
 };
 
-let buildCommands = (condition) => {
+let buildCommands = condition => {
     let commandArr = new Array(), command;
     if (condition) {
         for (let cond of condition) {
@@ -97,6 +97,7 @@ let buildCommands = (condition) => {
         }
     } else {
         for (let [tableName,table] of db.entries()) {
+            if ("condition" === tableName) continue;
             command = new Object();
             command.id = tableName;
             command.key = tableName;
@@ -132,23 +133,42 @@ let readConfigPlan = () => {
     return planDB;
 };
 
-let buildOrderList = (arr,$sce,$scope) => {
+let buildOrderList = (arr, $sce, $scope) => {
     let innerHtml = "", sequence = 0, max_sequence = colorTag.length - 1, value;
-    for(let type of arr){
+    for (let type of arr) {
         value = type.selected.join(" ");
         innerHtml += `<h4><span class="label ${colorTag[sequence]}">${type.id}</span>
                             <small class="pull-right">${value}</small>
                         </h4>`;
-        if("能力" == type.id) selectPic(value,$scope);
+        if ("能力" == type.id) selectPic(value, $scope);
         sequence == max_sequence ? sequence = 0 : sequence++;
     }
     return $sce.trustAsHtml(innerHtml);
 };
 
-let selectPic = (value,$scope) => {
-    if("12K" == value)
+let getConditionsByName = name => {
+    let condition = new Array();
+    for (let [key,value] of db.get("condition").entries()) {
+        if (name === value.execute) condition.push(value);
+    }
+    return condition;
+};
+
+let getOptions = (name, rang) => {
+    let table = db.get(name), options = new Array();
+    rang.forEach(value => {
+        if("string" == typeof value) value = Number.parseInt(value);
+        if (table.has(value)) {
+            options.push(core.values(table.get(value)));
+        }
+    });
+    return options;
+};
+
+let selectPic = (value, $scope) => {
+    if ("12K" == value)
         $scope.selectRandom = "小壳体.png";
-    else if("24K" == value)
+    else if ("24K" == value)
         $scope.selectRandom = "中壳体.png";
     else
         $scope.selectRandom = "大壳体.png";
@@ -156,14 +176,14 @@ let selectPic = (value,$scope) => {
 
 let GreeApp = angular.module('GreeApp', ['ngAnimate', 'ui.bootstrap']);
 
-GreeApp.controller("optionalListCtr", ['$scope','$rootScope','$selectPlain','$uibModal','$sce', ($scope,$rootScope,$selectPlain,$uibModal,$sce) => {
+GreeApp.controller("optionalListCtr", ['$scope', '$rootScope', '$selectPlain', '$uibModal', '$sce', ($scope, $rootScope, $selectPlain, $uibModal, $sce) => {
     $scope.selectRandom = "userLogo.png";
     $scope.planName = "请选型";
 
     $rootScope.$on("optionalList", () => {
         $scope.selectPlan = false;
         $scope.planName = $selectPlain.getPlanName();
-        $scope.TrustDangerousSnippet = buildOrderList($selectPlain.getSelectPlan(),$sce,$scope);
+        $scope.TrustDangerousSnippet = buildOrderList($selectPlain.getSelectPlan(), $sce, $scope);
     });
 
     $scope.openPro = () => {
@@ -174,8 +194,8 @@ GreeApp.controller("optionalListCtr", ['$scope','$rootScope','$selectPlain','$ui
             size: "sm",
             resolve: {
                 message: {
-                    context : "正在打开PRO Engineer",
-                    title : "这里！"
+                    context: "正在打开PRO Engineer",
+                    title: "这里！"
                 }
             }
         });
@@ -197,14 +217,37 @@ GreeApp.controller("selectCaseCtr", ['$scope', '$rootScope', '$sce', '$selectPla
         $rootScope.$broadcast("backPlan");
     };
 
+    $scope.checkOthers = (selectOption, label) => {
+        let conditions = getConditionsByName(label), value = selectOption.selected[0];
+        console.log(value);
+        if (conditions.length > 0) { // 如果条件存在 则循环删除个个command的信息
+            conditions.forEach(condition => {
+                $scope.commands.forEach(command => {
+                    let flag;
+                    if (command.name === condition.target) {
+                        flag = (value >= condition.min && value <= condition.max);
+                        if (false === flag) return;
+                        command.options.options = getOptions(condition.target, condition.rang);
+                        if (command.options.options.length > 0) {
+                            command.options.options.selected = command.options.options[0];
+                            command.error = false;
+                        }
+                        else
+                            command.error = true;
+                    }
+                });
+            });
+        }
+    };
+
     $scope.selectChange = dom => console.log(dom);
 
     $scope.exportSelect = () => {
         let solutionPlane = new Array();
-        for(let command of $scope.commands){
+        for (let command of $scope.commands) {
             solutionPlane.push({
-                id : command.id,
-                selected : command.options.selected
+                id: command.id,
+                selected: command.options.selected
             });
         }
         $rootScope.$broadcast("nextPlan");
@@ -304,16 +347,16 @@ GreeApp.service('$selectPlain', function () {
         setPlan: value => {
             plan = value;
         },
-        getSelectPlan : () => {
+        getSelectPlan: () => {
             return selectPlan;
         },
-        setSelectPlan : value => {
+        setSelectPlan: value => {
             selectPlan = value;
         },
-        getPlanName : () => {
+        getPlanName: () => {
             return planName;
         },
-        setPlanName : value => {
+        setPlanName: value => {
             planName = value;
         }
     };
@@ -356,7 +399,7 @@ GreeApp.controller('ModalInstanceCtrl', ($scope, $uibModalInstance) => {
     };
 });
 
-GreeApp.controller('altMsgCtr',($scope,$uibModalInstance,message) => {
+GreeApp.controller('altMsgCtr', ($scope, $uibModalInstance, message) => {
     $scope.messageTitle = message.title;
     $scope.messageContext = message.context;
     $scope.ok = () => {

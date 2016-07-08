@@ -1,9 +1,9 @@
 /**
  * Created by afterloe on 16-1-7.
  */
-const [fs,uuid,dBug,dataPath] = [require("fs"), require('node-uuid'), true, `${process.env.APPDATA}/EngineeringWhite`];
+const [fs,uuid,dBug,dataPath,Condition] = [require("fs"), require('node-uuid'), true, `${process.env.APPDATA}/EngineeringWhite`, require("../domain/condition")];
 
-let [userDir,readVersionInfo,deleteFile,uploadMateSite,updateLoinInfos,postFiles,randomCode,readUserInfo,vers,result,writeJournal,getTime,formatDate,getDataPath,writeData,getDateBase] = [
+let [userDir,readVersionInfo,deleteFile,uploadMateSite,updateLoinInfos,postFiles,randomCode,readUserInfo,vers,result,writeJournal,getTime,formatDate,getDataPath,writeData,getDateBase,constructionTable,constructionCondition] = [
 /**
  * userDir
  *
@@ -295,39 +295,62 @@ let [userDir,readVersionInfo,deleteFile,uploadMateSite,updateLoinInfos,postFiles
             db.set(tableName, table);
         });
         return db;
+    },
+/**
+ * constructionTable
+ *
+ * 构建数据表
+ */
+    table => {
+        let classObject = new Object(), datas = table.data, dataItem, tableMap = new Object();
+        datas.forEach((item, index) => {
+            if (0 === index) {
+                item.forEach(value => {
+                    classObject[value] = null; // 构建表的schema
+                });
+            } else {
+                dataItem = new Object();
+                Object.keys(classObject).forEach((key, value) => {
+                    dataItem[key] = item[value]; // 将零散的数据组成表数据
+                });
+                tableMap[index] = dataItem;
+            }
+        });
+        return tableMap;
+    },
+/**
+ *  constructionCondition
+ *
+ * 构建规则
+ */
+    table => {
+        let datas = table.data, dataItem, tableMap = new Object();
+        datas.forEach((item, index) => {
+            if(0 === index) return;
+            tableMap[index] = new Condition(item);
+        });
+        return tableMap;
     }
 ];
 
+module.exports.constructionTable = constructionTable;
+module.exports.constructionCondition = constructionCondition;
+
 module.exports.userDir = userDir;
-
 module.exports.readVersionInfo = readVersionInfo;
-
 module.exports.deleteFile = deleteFile;
-
 module.exports.uploadMateSite = uploadMateSite;
-
 module.exports.updateLoinInfos = updateLoinInfos;
-
 module.exports.postFiles = postFiles;
-
 module.exports.randomCode = randomCode;
-
 module.exports.readUserInfo = readUserInfo;
-
 module.exports.vers = vers;
-
 module.exports.result = result;
-
 module.exports.writeJournal = writeJournal;
-
 module.exports.getTime = getTime;
-
 module.exports.formatDate = formatDate;
-
 module.exports.getDataPath = getDataPath;
-
 module.exports.writeData = writeData;
-
 module.exports.getDateBase = getDateBase;
 
 var hexcase = 0, b64pad = "", chrsz = 8;

@@ -170,10 +170,10 @@
 
 <script type="text/ng-template" id="command.html">
     <ng-repeat ng-repeat="command in commands">
-        <div class="form-group">
+        <div class="form-group" ng-class="{'has-error' : command.error}">
             <label class="dropPrompt">{{command.name}}</label>
             <select class="form-control" ng-model="command.options.selected"
-                    ng-options="o as o for o in command.options.options"></select>
+                    ng-options="o as o for o in command.options.options" ng-change="checkOthers(command.options,command.name)"></select>
         </div>
     </ng-repeat>
 </script>
