@@ -113,8 +113,8 @@ let assemblyCommands = item => {
     let options = new Array();
     for (let value of item.values()) {
         options.push({
-            key : value["id"],
-            value : core.values(value,0)
+            key: value["id"],
+            value: core.values(value, 0)
         });
     }
     return {
@@ -158,14 +158,14 @@ let getConditionsByName = name => {
 };
 
 let getOptions = (name, rang) => {
-    let table = db.get(name), options = new Array(),values;
+    let table = db.get(name), options = new Array(), values;
     rang.forEach(value => {
-        if("string" == typeof value) value = Number.parseInt(value);
+        if ("string" == typeof value) value = Number.parseInt(value);
         if (table.has(value)) {
             values = table.get(value);
             options.push({
-                key : value,
-                value : core.values(values,0)
+                key: value,
+                value: core.values(values, 0)
             });
         }
     });
@@ -174,11 +174,13 @@ let getOptions = (name, rang) => {
 
 let selectPic = (value, $scope) => {
 // TODO
-        $scope.selectRandom = "大壳体.png";
+//    $scope.selectRandom = "小壳体.png";
+//    $scope.selectRandom = "中壳体.png";
+    $scope.selectRandom = "大壳体.png";
 };
 
-let transformValue = (value,label) => {
-    if("能力" === label)
+let transformValue = (value, label) => {
+    if ("能力" === label)
         return value.value[0];
     else
         return value.key;
@@ -227,13 +229,8 @@ GreeApp.controller("selectCaseCtr", ['$scope', '$rootScope', '$sce', '$selectPla
         $rootScope.$broadcast("backPlan");
     };
 
-    $scope.obtainLicense = license => {
-        $scope.license = license;
-    };
-
     $scope.checkOthers = (selectOption, label) => {
-        //if(label != $scope.license) return;
-        let conditions = getConditionsByName(label), value = transformValue(selectOption.selected,label), flag;
+        let conditions = getConditionsByName(label), value = transformValue(selectOption.selected, label), flag;
         if (conditions.length > 0) { // 如果条件存在 则循环删除个个command的信息
             conditions.forEach(condition => {
                 $scope.commands.forEach(command => {

@@ -158,11 +158,15 @@
 
 <script type="text/ng-template" id="commandDrag.html">
     <ng-repeat ng-repeat="command in commands">
-        <div draggable="true" ondragstart="drag(event)" id="{{command.id}}" class="electron-item">
-            <div class="form-group">
+        <div draggable="true" ondragstart="drag(event)" id="{{command.id}}" class="electron-item" ng-switch="command.type">
+            <div class="form-group" ng-switch-when="selection">
                 <label class="dropPrompt">{{command.name}}</label>
                 <select class="form-control tagSelect" ng-model="command.options.selected"
                         ng-options="o as o.value for o in command.options.options" disabled="disabled"></select>
+            </div>
+            <div class="form-group" ng-switch-default>
+                <label for="{{command.id}}">{{command.name}}</label>
+                <input type="email" class="form-control" placeholder="{{command.default}}">
             </div>
         </div>
     </ng-repeat>
@@ -170,10 +174,16 @@
 
 <script type="text/ng-template" id="command.html">
     <ng-repeat ng-repeat="command in commands">
-        <div class="form-group" ng-class="{'has-error' : command.error}">
-            <label class="dropPrompt">{{command.name}}</label>
-            <select class="form-control" ng-model="command.options.selected"
-                    ng-options="o as o.value for o in command.options.options" ng-change="checkOthers(command.options,command.name)" ng-focus="obtainLicense(command.name)"></select>
+        <div ng-switch="command.type">
+            <div class="form-group" ng-class="{'has-error' : command.error}" ng-switch-when="selection">
+                <label class="dropPrompt">{{command.name}}</label>
+                <select class="form-control" ng-model="command.options.selected"
+                        ng-options="o as o.value for o in command.options.options" ng-change="checkOthers(command.options,command.name)"></select>
+            </div>
+            <div class="form-group" ng-class="{'has-error' : command.error}" ng-switch-default>
+                <label for="{{command.id}}">{{command.name}}</label>
+                <input type="email" class="form-control" id="{{command.id}}" placeholder="{{command.default}}">
+            </div>
         </div>
     </ng-repeat>
 </script>
