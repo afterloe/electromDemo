@@ -112,7 +112,10 @@ let buildCommands = condition => {
 let assemblyCommands = item => {
     let options = new Array();
     for (let value of item.values()) {
-        options.push(core.values(value));
+        options.push({
+            key : value["id"],
+            value : core.values(value,0)
+        });
     }
     return {
         options, selected: options[0]
@@ -136,7 +139,7 @@ let readConfigPlan = () => {
 let buildOrderList = (arr, $sce, $scope) => {
     let innerHtml = "", sequence = 0, max_sequence = colorTag.length - 1, value;
     for (let type of arr) {
-        value = type.selected.join(" ");
+        value = type.selected.value.join(" ");
         innerHtml += `<h4><span class="label ${colorTag[sequence]}">${type.id}</span>
                             <small class="pull-right">${value}</small>
                         </h4>`;
@@ -155,23 +158,30 @@ let getConditionsByName = name => {
 };
 
 let getOptions = (name, rang) => {
-    let table = db.get(name), options = new Array();
+    let table = db.get(name), options = new Array(),values;
     rang.forEach(value => {
         if("string" == typeof value) value = Number.parseInt(value);
         if (table.has(value)) {
-            options.push(core.values(table.get(value)));
+            values = table.get(value);
+            options.push({
+                key : value,
+                value : core.values(values,0)
+            });
         }
     });
     return options;
 };
 
 let selectPic = (value, $scope) => {
-    if ("12K" == value)
-        $scope.selectRandom = "小壳体.png";
-    else if ("24K" == value)
-        $scope.selectRandom = "中壳体.png";
-    else
+// TODO
         $scope.selectRandom = "大壳体.png";
+};
+
+let transformValue = (value,label) => {
+    if("能力" === label)
+        return value.value[0];
+    else
+        return value.key;
 };
 
 let GreeApp = angular.module('GreeApp', ['ngAnimate', 'ui.bootstrap']);
@@ -217,22 +227,24 @@ GreeApp.controller("selectCaseCtr", ['$scope', '$rootScope', '$sce', '$selectPla
         $rootScope.$broadcast("backPlan");
     };
 
+    $scope.obtainLicense = license => {
+        $scope.license = license;
+    };
+
     $scope.checkOthers = (selectOption, label) => {
-        let conditions = getConditionsByName(label), value = selectOption.selected[0];
-        console.log(value);
+        //if(label != $scope.license) return;
+        let conditions = getConditionsByName(label), value = transformValue(selectOption.selected,label), flag;
         if (conditions.length > 0) { // 如果条件存在 则循环删除个个command的信息
             conditions.forEach(condition => {
                 $scope.commands.forEach(command => {
-                    let flag;
                     if (command.name === condition.target) {
                         flag = (value >= condition.min && value <= condition.max);
-                        if (false === flag) return;
+                        if (!flag) return;
                         command.options.options = getOptions(condition.target, condition.rang);
                         if (command.options.options.length > 0) {
-                            command.options.options.selected = command.options.options[0];
+                            command.options.selected = command.options.options[0];
                             command.error = false;
-                        }
-                        else
+                        } else
                             command.error = true;
                     }
                 });

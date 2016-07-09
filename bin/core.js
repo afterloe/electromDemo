@@ -384,11 +384,16 @@ module.exports.readJson = (path, flag) => {
     }
 };
 
-module.exports.values = jsonObject => {
+module.exports.values = (jsonObject,flag) => {
     let values = new Array();
-    Object.keys(jsonObject).forEach(item => {
-        values.push(jsonObject[item]);
-    });
+    try{
+        Object.keys(jsonObject).forEach((item,index) => {
+            if(index === flag) return;
+            values.push(jsonObject[item]);
+        });
+    }catch(err){
+        return values;
+    }
     return values;
 };
 

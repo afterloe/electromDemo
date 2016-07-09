@@ -20,16 +20,19 @@ class Condition {
         arr = arr[0].split("~");
         let flag = 2 === arr.length;
         if(flag){
-            this.min = arr[0];
-            this.max = arr[1];
+            this.min = Number.parseInt(arr[0]);
+            this.max = Number.parseInt(arr[1]);
         }else{
-            this.min = arr[0];
-            this.max = arr[0];
+            this.min = Number.parseInt(arr[0]);
+            this.max = Number.parseInt(arr[0]);
         }
     }
 
     [buildTagRange](arr){
-        if(!arr) return;
+        if(!arr) {
+            this.rang = new Array();
+            return;
+        }
         arr = arr[0].split(",");
         this.rang = arr;
     }
