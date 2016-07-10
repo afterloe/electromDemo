@@ -1,0 +1,12 @@
+.row {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+.model {
+    border-radius: 25px;
+    border: 2px solid #8AC007;
+    padding: 20px;
+    width: 120px;
+    height: 15px;
+}

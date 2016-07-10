@@ -126,6 +126,10 @@ let openFile = () => {
     utilContr.noticeMaster("openFileDialog", {});
 };
 
+utilContr.resMaster({name : "executeInfo"},(error,data) => {
+    location.reload();
+});
+
 let readConfigPlan = () => {
     if (!planDB) {
         planDB = new Array();
@@ -256,12 +260,18 @@ GreeApp.controller("selectCaseCtr", ['$scope', '$rootScope', '$sce', '$selectPla
         for (let command of $scope.commands) {
             solutionPlane.push({
                 id: command.id,
+                key : command.options.selected.key,
                 selected: command.options.selected
             });
         }
         $rootScope.$broadcast("nextPlan");
         $selectPlain.setSelectPlan(solutionPlane);
         $rootScope.$broadcast("optionalList");
+        // 写出指定位置写出XML
+        utilContr.noticeMaster("writeSelectedData",{
+            name : "xxx",
+            data : solutionPlane
+        });
     };
 
     $rootScope.$on("loadPlanInSelection", () => {

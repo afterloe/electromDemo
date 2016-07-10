@@ -4,28 +4,37 @@
  * @mail afterloeliu@jwis.cn
  * @version 1.0.0
  */
-const tacitcsTemplate = require("../domain/dispatchTactics");
+const [tacitcsTemplate,EasyHook,fs] = [require("../domain/dispatchTactics"), require("../domain/EasyHook"), require("fs")];
+let hook = new EasyHook(fs.watchFile), hookList = new Array();
 
 module.exports = electron => {
     let ipc = electron.ipcMain, dispatchTactics = new tacitcsTemplate(electron);
 
-    ipc.on("system",(event,param) => {
+    ipc.on("system", (event, param) => {
         let {tacticBlock, _param, tacticName} = param;
         tacticBlock = dispatchTactics[tacticBlock];
-        if(tacticBlock)
-            tacticBlock.apply(dispatchTactics,[_param]);
+        if (tacticBlock)
+            tacticBlock.apply(dispatchTactics, [_param,(error,data) => {
+                event.sender.send("executeInfo",data);
+            }]);
         else {
-            event.sender.send("no such this tactic!");
+            event.sender.send("executeFail","no such this tactic!");
         }
     });
 
-    // ipc.on('open-file-dialog', (event, obj) => {
-    //   console.log(obj); // ==>  { age: 5, name: 'afterloe' }
-    //   event.sender.send("receive-message", obj); // ==> 反向通讯
-    //   dialog.showOpenDialog({
-    //     properties: ['openFile', 'openDirectory']
-    //   }, files => {
-    //     if (files) event.sender.send('selected-directory', files);
-    //   });
-    // });
+    ipc.on("hook-file", (event, param) => {
+        let {file} = param;
+        try{
+            if(-1 != hookList.findIndex(item => item == file)) throw new Error("arrayListen");
+            hookList.push(file);
+            hook.setHookFile(file);
+            hook.startTask((err,hookTime) => {
+                event.sender.send("hookInfo", hookTime);
+            });
+            console.log("execute hook file -- " + file);
+        }catch(err){
+            console.log(err);
+            event.sender.send("hookFail", err.message);
+        }
+    });
 };
