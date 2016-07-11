@@ -16,11 +16,12 @@ class EasyHook {
 
     startTask(callback) {
         if (!callback) throw new Error("Lack listeners callback function");
-        this.hookTask = this.execute(this.fileName, {
+        let _self = this;
+        _self.hookTask = this.execute(this.fileName, {
             persistent: true,
             interval: 1000
         }, (curr, prev) => {
-            callback(null,prev.mtime);
+            callback(null,prev.mtime,_self.fileName);
         });
     }
 }

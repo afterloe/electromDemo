@@ -10,12 +10,30 @@ class DispatchTactics {
         this.BrowserWindow = electron.BrowserWindow;
     }
 
+    showWindow(param){
+        let {windowName} = param;
+        if("frameWindow" == windowName)
+            global.engineerWhite.contextFrameWindow.show();
+        else
+            global.engineerWhite.mainFrameWindow.show();
+    }
+
     closeWindow() {
         this.BrowserWindow.getFocusedWindow().hide();
     }
 
     miniWindow() {
         this.BrowserWindow.getFocusedWindow().minimize();
+    }
+
+    openMsgWindow(param, callback) {
+        let {url,title} = param;
+        if(!url) {
+            if(callback) callback(new Error("No such this msg information"));
+            return;
+        }
+        windowBuilder.buildMsgNoticeWindow({url,title});
+        if(callback) callback();
     }
 
     openFrameWindow(param, callback) {

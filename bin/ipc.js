@@ -5,7 +5,7 @@
  * @version 1.0.0
  */
 const [tacitcsTemplate,EasyHook,fs] = [require("../domain/dispatchTactics"), require("../domain/EasyHook"), require("fs")];
-let hook = new EasyHook(fs.watchFile), hookList = new Array();
+let hookList = new Array();
 
 module.exports = electron => {
     let ipc = electron.ipcMain, dispatchTactics = new tacitcsTemplate(electron);
@@ -27,9 +27,10 @@ module.exports = electron => {
         try{
             if(-1 != hookList.findIndex(item => item == file)) throw new Error("arrayListen");
             hookList.push(file);
+            let hook = new EasyHook(fs.watchFile);
             hook.setHookFile(file);
-            hook.startTask((err,hookTime) => {
-                event.sender.send("hookInfo", hookTime);
+            hook.startTask((...args) => {
+                event.sender.send("hookInfo", args);
             });
             console.log("execute hook file -- " + file);
         }catch(err){

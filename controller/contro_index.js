@@ -4,6 +4,15 @@ let app = angular.module('indexApp', ['ui.bootstrap']).controller('indexCtrl', $
 
   require(`${__dirname}/../controller/contro_common`)($scope);
   $scope.index_flowAdd = "欢迎使用TRU mate";
+
+  //TODO
+  $scope.openMsgWindow = () => {
+    utilContr.noticeMaster("openMsgWindow",{
+      url : `${__dirname}/configControls.html`,
+      title : "DEMO open"
+    });
+  };
+
   /**
    * 日历控件
    */

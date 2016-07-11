@@ -234,21 +234,32 @@ GreeApp.controller("selectCaseCtr", ['$scope', '$rootScope', '$sce', '$selectPla
     };
 
     $scope.checkOthers = (selectOption, label) => {
-        let conditions = getConditionsByName(label), value = transformValue(selectOption.selected, label), flag;
+        let conditions = getConditionsByName(label), value = transformValue(selectOption.selected, label), flagArr = new Array(), _flag;
         if (conditions.length > 0) { // 如果条件存在 则循环删除个个command的信息
-            conditions.forEach(condition => {
-                $scope.commands.forEach(command => {
-                    if (command.name === condition.target) {
-                        flag = (value >= condition.min && value <= condition.max);
-                        if (!flag) return;
-                        command.options.options = getOptions(condition.target, condition.rang);
-                        if (command.options.options.length > 0) {
-                            command.options.selected = command.options.options[0];
-                            command.error = false;
-                        } else
-                            command.error = true;
+            $scope.commands.forEach(control => {
+                conditions.forEach(condition => {
+                    if(control.name === condition.target){
+                        _flag = (value >= condition.min && value <= condition.max);
+                        flagArr.push(_flag);
+                        if(_flag){
+                            control.options.options = getOptions(condition.target, condition.rang);
+                            if (control.options.options.length > 0) {
+                                control.options.selected = control.options.options[0];
+                                control.error = false;
+                            } else
+                                control.error = true;
+                        }
                     }
                 });
+                if(flagArr.length > 0) {
+                    let flag = false;
+                    flagArr.forEach(_flag => _flag ? flag = true : null);
+                    if(!flag){
+                        control.options.options = new Array();
+                        control.options.selected = {};
+                        control.error = true;
+                    }
+                }
             });
         }
     };

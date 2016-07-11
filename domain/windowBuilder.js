@@ -4,6 +4,30 @@ const {
     core = require("../bin/core")
 } = require("electron");
 
+class MsgNoticeWindow {
+    constructor(_param) {
+        let cfg = core.readJson(`${__dirname}/../conf/frameWindow.json`),
+            msgNoticeWindow, frameWindow;
+        if (!cfg || !cfg.msgNoticeWindow) throw new Error("read config failed!");
+        msgNoticeWindow = cfg.msgNoticeWindow;
+        let {width,height} = engineerWhite.screen;
+        if (undefined === msgNoticeWindow.width || "auto" === msgNoticeWindow.width) msgNoticeWindow.width = Math.ceil(width * 0.15) > 300 ? Math.ceil(width * 0.15) : 300;
+        if (undefined === msgNoticeWindow.height || "auto" === msgNoticeWindow.height) msgNoticeWindow.height = Math.ceil(height * 0.20) > 200 ? Math.ceil(height * 0.20) : 200;
+        if (undefined === msgNoticeWindow.x || "auto" === msgNoticeWindow.x) msgNoticeWindow.x = Math.ceil(width - msgNoticeWindow.width);
+        if (undefined === msgNoticeWindow.y || "auto" === msgNoticeWindow.y) msgNoticeWindow.y = Math.ceil(height - msgNoticeWindow.height);
+        msgNoticeWindow.icon = engineerWhite.icon;
+        msgNoticeWindow.title = `${msgNoticeWindow.title} ${_param.title}`;
+        frameWindow = new BrowserWindow(msgNoticeWindow);
+        if (msgNoticeWindow.debug) frameWindow.webContents.openDevTools();
+        frameWindow.loadURL(_param.url);
+        frameWindow.on("closed", () => {
+            frameWindow = null;
+            global.engineerWhite.msgNoticeWindow = null;
+        });
+        return frameWindow;
+    }
+}
+
 class ContextFrameWindow {
     constructor(_param) {
         let cfg = core.readJson(`${__dirname}/../conf/frameWindow.json`),
@@ -84,9 +108,16 @@ class windowBuilder {
     /**
      *  构建消息弹窗
      */
-    static buildMsgNoticeWindow() {
-        let frameWindow = global.engineerWhite.msgNoticeWindow;
-        return frameWindow ? frameWindow : global.engineerWhite.msgNoticeWindow = new MsgNoticeWindow();
+    static buildMsgNoticeWindow(_param) {
+        let msgNoticeWindow = global.engineerWhite.msgNoticeWindow;
+        if(msgNoticeWindow) {
+            msgNoticeWindow.loadURL(_param.url);
+            msgNoticeWindow.setTitle(_param.title);
+            if (!msgNoticeWindow.isVisible()) msgNoticeWindow.show();
+            else msgNoticeWindow.focus();
+            return msgNoticeWindow;
+        } else
+            return global.engineerWhite.msgNoticeWindow = new MsgNoticeWindow(_param);
     }
 
     /**

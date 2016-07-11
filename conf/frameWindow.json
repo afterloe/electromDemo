@@ -15,6 +15,21 @@
     "darkTheme" : true,
     "debug" : false
   },
+  "msgNoticeWindow" : {
+    "width" : "auto",
+    "height" : "auto",
+    "x" : "auto",
+    "y" : "auto",
+    "frame" : false,
+    "resizable" : false,
+    "title" : "TRU Msg - ",
+    "resizable" : false,
+    "movable" : false,
+    "alwaysOnTop" : true,
+    "useContentSize" : true,
+    "darkTheme" : true,
+    "debug" : false
+  },
   "contextFrameWindow" : {
     "width" : "auto",
     "height" : "auto",
