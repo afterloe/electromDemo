@@ -82,7 +82,6 @@ class DispatchTactics {
 
     writeSelectedData(param) {
         let {name,data,context,$,flag = false} = param;
-        //PATH_MDLLOAD_XML
         $ = cheerio.load(fs.readFileSync(PATH_MDLLOAD_XML).toString("utf-8"), {
             withDomLvl1: true,
             normalizeWhitespace: false,

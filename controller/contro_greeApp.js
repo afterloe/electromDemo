@@ -122,13 +122,14 @@ let assemblyCommands = item => {
     };
 };
 
+utilContr.resSystemInfo("uploadDatabases", (err, tacticBlock, data) => {
+    console.log(JSON.stringify(err), tacticBlock, data);
+    location.reload();
+});
+
 let openFile = () => {
     utilContr.noticeMaster("openFileDialog", {});
 };
-
-utilContr.resMaster({name : "executeInfo"},(error,data) => {
-    location.reload();
-});
 
 let readConfigPlan = () => {
     if (!planDB) {
