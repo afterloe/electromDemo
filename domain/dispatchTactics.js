@@ -12,19 +12,19 @@ class DispatchTactics {
         this.cache = new Map();
     }
 
-    getMemoryCache(param,callback){
+    getMemoryCache(param, callback) {
         let {url} = param;
-        return (this.cache.has(url)&& callback) ? callback(null, "getMemoryCache", this.cache.get(url)) : callback(new Error("no such this cache in memory."), "getMemoryCache");
+        return (this.cache.has(url) && callback) ? callback(null, "getMemoryCache", this.cache.get(url)) : callback(new Error("no such this cache in memory."), "getMemoryCache");
     }
 
-    setMemoryCache(param){
+    setMemoryCache(param) {
         let {url,data} = param;
-        return this.cache.set(url,data);
+        return this.cache.set(url, data);
     }
 
-    showWindow(param){
+    showWindow(param) {
         let {windowName} = param;
-        if("frameWindow" == windowName)
+        if ("frameWindow" == windowName)
             global.engineerWhite.contextFrameWindow.show();
         else
             global.engineerWhite.mainFrameWindow.show();
@@ -40,12 +40,12 @@ class DispatchTactics {
 
     openMsgWindow(param, callback) {
         let {url,title} = param;
-        if(!url) {
-            if(callback) callback(new Error("No such this msg information"));
+        if (!url) {
+            if (callback) callback(new Error("No such this msg information"));
             return;
         }
-        windowBuilder.buildMsgNoticeWindow({url,title});
-        if(callback) callback(null, "openMsgWindow");
+        windowBuilder.buildMsgNoticeWindow({url, title});
+        if (callback) callback(null, "openMsgWindow");
     }
 
     openFrameWindow(param, callback) {
@@ -89,24 +89,20 @@ class DispatchTactics {
             decodeEntities: true
         });
 
-        if(data && data instanceof Array){
+        if (data && data instanceof Array) {
             data.forEach(command => {
                 $("moldbase").append(`<comp name="water-mp-customize" target=${command.id} value=${command.key}/>`);
             });
             flag = true;
         }
 
-        if(flag) fs.writeFileSync(PATH_MDLLOAD_XML,$.xml());
+        if (flag) fs.writeFileSync(PATH_MDLLOAD_XML, $.xml());
     }
 
     uploadDatabases(param, callback) {
         let data = xlsx.parse(param.filePath), databases = new Object();
         for (let table of data) {
-            if ("condition" === table.name) {
-                databases[table.name] = core.constructionCondition(table);
-            } else {
-                databases[table.name] = core.constructionTable(table);
-            }
+            databases[table.name] = core.constructionTable(table);
         }
         core.writeData(databases, `${__dirname}/../databases/gree.db`);
         if (callback) callback(null, "uploadDatabases");
