@@ -11,11 +11,11 @@ module.exports = electron => {
     let ipc = electron.ipcMain, dispatchTactics = new tacitcsTemplate(electron);
 
     ipc.on("system", (event, param) => {
-        let {tacticBlock, _param, tacticName} = param;
+        let {tacticBlock, _param} = param;
         tacticBlock = dispatchTactics[tacticBlock];
         if (tacticBlock)
-            tacticBlock.apply(dispatchTactics, [_param,(error,data) => {
-                event.sender.send("executeInfo",data);
+            tacticBlock.apply(dispatchTactics, [_param, (...args) => {
+                event.sender.send("executeInfo",args);
             }]);
         else {
             event.sender.send("executeFail","no such this tactic!");

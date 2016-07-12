@@ -7,10 +7,31 @@ let app = angular.module('indexApp', ['ui.bootstrap']).controller('indexCtrl', $
 
   //TODO
   $scope.openMsgWindow = () => {
-    utilContr.noticeMaster("openMsgWindow",{
-      url : `${__dirname}/configControls.html`,
-      title : "DEMO open"
+    utilContr.noticeMaster("setMemoryCache",{
+      url : "http://www.baidu.com",
+      data : "别看我就是一只羊，天空也因为我变得很蓝"
     });
+    utilContr.noticeMaster("setMemoryCache",{
+      url : "http://www.baidu.com1",
+      data : "别看我就是一只羊，天空也因为我变得很蓝1"
+    });
+    utilContr.noticeMaster("setMemoryCache",{
+      url : "http://www.baidu.com2",
+      data : "别看我就是一只羊，天空也因为我变得很蓝2"
+    });
+
+    utilContr.resSystemInfo("getMemoryCache", (err, tacticBlock, data) => {
+      console.log(JSON.stringify(err), tacticBlock, data);
+    });
+
+    utilContr.noticeMaster("getMemoryCache", {
+      url : "http://www.baidu.com"
+    });
+    
+    //utilContr.noticeMaster("openMsgWindow",{
+    //  url : `${__dirname}/configControls.html`,
+    //  title : "DEMO open"
+    //});
   };
 
   /**

@@ -8,6 +8,18 @@ class DispatchTactics {
         this.app = electron.app;
         this.dialog = electron.dialog;
         this.BrowserWindow = electron.BrowserWindow;
+        // cache
+        this.cache = new Map();
+    }
+
+    getMemoryCache(param,callback){
+        let {url} = param;
+        return (this.cache.has(url)&& callback) ? callback(null, "getMemoryCache", this.cache.get(url)) : callback(new Error("no such this cache in memory."), "getMemoryCache");
+    }
+
+    setMemoryCache(param){
+        let {url,data} = param;
+        return this.cache.set(url,data);
     }
 
     showWindow(param){
@@ -33,14 +45,14 @@ class DispatchTactics {
             return;
         }
         windowBuilder.buildMsgNoticeWindow({url,title});
-        if(callback) callback();
+        if(callback) callback(null, "openMsgWindow");
     }
 
     openFrameWindow(param, callback) {
         if (!param.url)
             param.url = `file://${__dirname}/../views/frameWindow.html`;
         windowBuilder.buildContextFrameWindow(param);
-        if (callback) callback();
+        if (callback) callback(null, "openFrameWindow");
     }
 
     openFileDialog(param, callback) {

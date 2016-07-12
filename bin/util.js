@@ -9,7 +9,7 @@ let accessObject = time => {
     };
 };
 
-let _callback = new Array();
+let _callback = new Array(), systemInfoCallback = new Array();
 
 msgSender.on("hookInfo", (event, params) => {
     let fileType = params[2],index = _callback.findIndex(registered => fileType == registered.fileName),object;
@@ -27,6 +27,28 @@ msgSender.on("hookFail", (event, params) => {
     }
 });
 
+msgSender.on("executeInfo", (event, params) => {
+    let _object = systemInfoCallback.find(__object => __object.tacticBlock === params[1]);
+    if(_object){
+        _object.callback.apply(null,params);
+    }
+});
+
+msgSender.on("executeFail", (event, params) => {
+    let _object = systemInfoCallback.find(__object => __object.tacticBlock === params[1]);
+    if(_object){
+        _object.callback.apply(null,params);
+    }
+});
+
+module.exports.resSystemInfo = (tacticBlock,callback) => {
+    if(-1 === systemInfoCallback.findIndex(_object => tacticBlock === _object.tacticBlock)){
+        systemInfoCallback.push({
+            tacticBlock,callback
+        });
+    }
+};
+
 module.exports.hook = (fileName, callback) => {
     msgSender.send("hook-file", {
         file: fileName
@@ -40,13 +62,6 @@ module.exports.noticeMaster = (instruction, _param) => {
     msgSender.send("system", {
         tacticBlock: instruction,
         _param
-    });
-};
-
-module.exports.resMaster = (_param, callback) => {
-    let {name} = _param;
-    msgSender.on(name, (event, params) => {
-        callback(null, params);
     });
 };
 
