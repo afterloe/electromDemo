@@ -13,15 +13,16 @@ let init = $scope => {
     $scope.selectCase = true;
     $scope.optionalList = true;
 };
-// TODO
+
 let allowDrop = ev => ev.preventDefault();
 
-let drag = ev => ev.dataTransfer.setData("Text", ev.path[0].innerText);
+let drag = ev => ev.dataTransfer.setData("modelName", ev.path[0].innerText);
 
 let drop = (ev) => {
     ev.preventDefault();
-    console.log(3);
-    console.log(ev);
+    let modelName = ev.dataTransfer.getData("modelName"), level = Number.parseInt(ev.path[1].className.substring(ev.path[1].className.length - 1)) + 1,
+        partHtml = `<h3 class="col-md-offset-${level}" ondrop="drop(event,'source')" ondragover="allowDrop(event)"><span class="label ${colorTag[level]}">${modelName}</span></h3>`;
+    ev.path[1].innerHTML += partHtml;
 };
 
 let selectPlan = function (tabNumber) {
@@ -66,34 +67,6 @@ let selectPlan = function (tabNumber) {
             this.optionalList = false;
             break;
     }
-};
-
-let buildCommands = condition => {
-    let commandArr = new Array(), command;
-    if (condition) {
-        for (let cond of condition) {
-            for (let [tableName,table] of db.entries()) {
-                if (cond !== tableName) continue;
-                command = new Object();
-                command.id = tableName;
-                command.key = tableName;
-                command.name = tableName;
-                command.options = assemblyCommands(table);
-                commandArr.push(command);
-            }
-        }
-    } else {
-        for (let [tableName,table] of db.entries()) {
-            if ("condition" === tableName) continue;
-            command = new Object();
-            command.id = tableName;
-            command.key = tableName;
-            command.name = tableName;
-            command.options = assemblyCommands(table);
-            commandArr.push(command);
-        }
-    }
-    return commandArr;
 };
 
 let assemblyCommands = item => {
@@ -226,6 +199,22 @@ let findParts = (produce,type) => {
     return partList;
 };
 
+let buildCommands = bomList => {
+    let _commandList = new Array();
+    // TODO
+    if(bomList && bomList instanceof Array) {
+        bomList.forEach(__bom => {
+            _commandList.push({
+                error : false,
+                name : __bom.type,
+                options : ["1","2","3"],
+                selected : "1"
+            });
+        });
+    }
+    return _commandList;
+};
+
 let GreeApp = angular.module('GreeApp', ['ngAnimate', 'ui.bootstrap']);
 
 GreeApp.controller("optionalListCtr", ['$scope', '$rootScope', '$selectPlain', '$uibModal', '$sce', ($scope, $rootScope, $selectPlain, $uibModal, $sce) => {
@@ -338,11 +327,14 @@ GreeApp.controller("selectPlanCtr", ['$scope', '$sce', '$uibModal', '$log', '$ro
     };
 
     $scope.TrustDangerousSnippet = snippet => $sce.trustAsHtml(snippet);
+    $scope.productsNum = $scope.products.options.length - 1;
 
     $scope.loadBom = selected => {
-        $scope.bom = renderBOM(findBOM(selected));
+        let bomObject = findBOM(selected);
+        $scope.bom = renderBOM(bomObject);
         $scope.partGroups = getPartsList(selected);
         $scope.selected = selected;
+        $selectPlain.setPlan(bomObject);
     };
 
     $scope.changeLi = (index, type) => {
@@ -353,19 +345,14 @@ GreeApp.controller("selectPlanCtr", ['$scope', '$sce', '$uibModal', '$log', '$ro
         $scope.partGroups[index].active = true;
         $scope.partGroups[index].parts = findParts($scope.selected,type);
         $scope.partGroups[index].number = $scope.partGroups[index].parts.length;
-        //number
     };
 
-    // TODO
-    console.log(db);
-    $scope.productsNum = 2;
     $scope.selectFile = openFile;
     $scope.updateDB = () => {
         location.reload();
     };
 
     $scope.nextStep = planName => {
-        //TODO
         $rootScope.$broadcast("nextPlan");
         $rootScope.$broadcast("loadPlanInSelection");
     };

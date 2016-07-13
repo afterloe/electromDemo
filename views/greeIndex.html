@@ -71,9 +71,9 @@
                 <small>选择类型后即可查看BOM</small>
             </h3>
             <div class="col-md-8">
-            <select class="form-control" ng-model="products.selected"
-                             ng-options="o as o for o in products.options"
-                             ng-change="loadBom(products.selected)"></select>
+                <select class="form-control" ng-model="products.selected"
+                        ng-options="o as o for o in products.options"
+                        ng-change="loadBom(products.selected)"></select>
             </div>
             <div class="col-md-4">
                 <button type="button" class="btn btn-info pull-right" ng-click="selectFile()"><span
@@ -122,7 +122,8 @@
 
 <script type="text/ng-template" id="partList.html">
     <ul class="nav nav-pills nav-stacked">
-        <li ng-repeat="group in partGroups" ng-class="{'active': group.active}" ng-click="changeLi($index,group.name)" draggable="true" ondragstart="drag(event,this)">
+        <li ng-repeat="group in partGroups" ng-class="{'active': group.active}" ng-click="changeLi($index,group.name)"
+            draggable="true" ondragstart="drag(event,this)">
             <a href="#"><span class="badge pull-right">{{group.number}}</span>{{group.name}}</a>
             <ng-repeat ng-repeat="sp in partGroups[$index].parts">
                 <ol class="part-simple" draggable="true" ondragstart="drag(event)" id="sp.id">{{sp.value}}</ol>
@@ -160,34 +161,13 @@
     </div>
 </script>
 
-<script type="text/ng-template" id="commandDrag.html">
-    <ng-repeat ng-repeat="command in commands">
-        <div draggable="true" ondragstart="drag(event)" id="{{command.id}}" class="electron-item" ng-switch="command.type">
-            <div class="form-group" ng-switch-default>
-                <label class="dropPrompt">{{command.name}}</label>
-                <select class="form-control tagSelect" ng-model="command.options.selected"
-                        ng-options="o as o.value for o in command.options.options" disabled="disabled"></select>
-            </div>
-            <div class="form-group" ng-switch-when="input">
-                <label for="{{command.id}}">{{command.name}}</label>
-                <input type="email" class="form-control" placeholder="{{command.default}}">
-            </div>
-        </div>
-    </ng-repeat>
-</script>
-
 <script type="text/ng-template" id="command.html">
     <ng-repeat ng-repeat="command in commands">
-        <div ng-switch="command.type">
-            <div class="form-group" ng-class="{'has-error' : command.error}" ng-switch-default>
-                <label class="dropPrompt">{{command.name}}</label>
-                <select class="form-control" ng-model="command.options.selected"
-                        ng-options="o as o.value for o in command.options.options" ng-change="checkOthers(command.options,command.name)"></select>
-            </div>
-            <div class="form-group" ng-class="{'has-error' : command.error}" ng-switch-when="input">
-                <label for="{{command.id}}">{{command.name}}</label>
-                <input type="email" class="form-control" id="{{command.id}}" placeholder="{{command.default}}">
-            </div>
+        <div class="form-group" ng-class="{'has-error' : command.error}">
+            <label class="dropPrompt">{{command.name}}</label>
+            <select class="form-control" ng-model="command.selected"
+                    ng-options="o as o for o in command.options"
+                    ng-change="checkOthers(command.options,command.name)"></select>
         </div>
     </ng-repeat>
 </script>
