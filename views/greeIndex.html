@@ -122,7 +122,7 @@
 
 <script type="text/ng-template" id="partList.html">
     <ul class="nav nav-pills nav-stacked">
-        <li ng-repeat="group in partGroups" ng-class="{'active': group.active}" ng-click="changeLi($index,group.name)" draggable="true" ondragstart="drag(event)">
+        <li ng-repeat="group in partGroups" ng-class="{'active': group.active}" ng-click="changeLi($index,group.name)" draggable="true" ondragstart="drag(event,this)">
             <a href="#"><span class="badge pull-right">{{group.number}}</span>{{group.name}}</a>
             <ng-repeat ng-repeat="sp in partGroups[$index].parts">
                 <ol class="part-simple" draggable="true" ondragstart="drag(event)" id="sp.id">{{sp.value}}</ol>

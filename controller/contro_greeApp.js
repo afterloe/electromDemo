@@ -6,35 +6,22 @@
  */
 const [core, utilContr] = [require("../bin/core"), require("../bin/util")];
 const colorTag = ['label-default', 'label-primary', 'label-success', 'label-info', 'label-warning', 'label-danger'];
-let db = core.getDateBase(), newItem = new Array();
+let db = core.getDateBase();
 
 let init = $scope => {
     $scope.selectPlan = false;
     $scope.selectCase = true;
     $scope.optionalList = true;
 };
-
+// TODO
 let allowDrop = ev => ev.preventDefault();
 
-let drag = ev => ev.dataTransfer.setData("Text", ev.target.id);
+let drag = ev => ev.dataTransfer.setData("Text", ev.path[0].innerText);
 
-let drop = (ev, flag) => {
+let drop = (ev) => {
     ev.preventDefault();
-    let data = ev.dataTransfer.getData("Text"), retDom = ev.target, tagDom = document.getElementById(data), command = tagDom.getElementsByClassName("tagSelect")[0];
-    flag = "tag" === flag;
-    if (flag) {
-        command.removeAttribute("disabled");
-        newItem.push({data, tagDom: tagDom.innerHTML});
-    } else {
-        let index = newItem.findIndex(item => item.data == data);
-        if (index > -1) newItem.splice(index, 1);
-        command.setAttribute("disabled", "disabled");
-    }
-    if (retDom.getAttribute("electron-drop"))
-        retDom.appendChild(tagDom);
-    else {
-        document.getElementById("tag" === flag ? "newSelectOrder" : "systemOrder").appendChild(tagDom);
-    }
+    console.log(3);
+    console.log(ev);
 };
 
 let selectPlan = function (tabNumber) {
@@ -182,7 +169,7 @@ let transformValue = (value, label) => {
 };
 
 let partType = () => {
-    let _arr = new Array("请选择产品"), part = db.get("part"), _type;
+    let _arr = new Array("请选择产品"), _type;
     for (let [key,value] of db.get("part").entries()) {
         _type = value.model;
         if (!_arr.find(__type => _type === __type)) _arr.push(_type);
@@ -208,7 +195,7 @@ let findBOM = produce => {
 let renderBOM = bom => {
     let bomHtml = "";
     bom.forEach(_part => {
-        bomHtml += `<h3 class="col-md-offset-${_part.level}"><span class="label ${colorTag[_part.level]}">${_part.type}</span></h3>`;
+        bomHtml += `<h3 class="col-md-offset-${_part.level}" ondrop="drop(event,'source')" ondragover="allowDrop(event)"><span class="label ${colorTag[_part.level]}">${_part.type}</span></h3>`;
     });
     return bomHtml;
 };
@@ -365,6 +352,8 @@ GreeApp.controller("selectPlanCtr", ['$scope', '$sce', '$uibModal', '$log', '$ro
         });
         $scope.partGroups[index].active = true;
         $scope.partGroups[index].parts = findParts($scope.selected,type);
+        $scope.partGroups[index].number = $scope.partGroups[index].parts.length;
+        //number
     };
 
     // TODO
@@ -376,8 +365,7 @@ GreeApp.controller("selectPlanCtr", ['$scope', '$sce', '$uibModal', '$log', '$ro
     };
 
     $scope.nextStep = planName => {
-        // TODO
-        newItem = new Array();
+        //TODO
         $rootScope.$broadcast("nextPlan");
         $rootScope.$broadcast("loadPlanInSelection");
     };
