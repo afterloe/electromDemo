@@ -6,7 +6,7 @@
  */
 const [core, utilContr] = [require("../bin/core"), require("../bin/util")];
 const colorTag = ['label-default', 'label-primary', 'label-success', 'label-info', 'label-warning', 'label-danger'];
-let db = core.getDateBase(), planDB = core.readJson(`${__dirname}/../databases/plan.json`), newItem = new Array();
+let db = core.getDateBase(), newItem = new Array();
 
 let init = $scope => {
     $scope.selectPlan = false;
@@ -131,16 +131,6 @@ let openFile = () => {
     utilContr.noticeMaster("openFileDialog", {});
 };
 
-let readConfigPlan = () => {
-    if (!planDB) {
-        planDB = new Array();
-        planDB.push("选择装配方案");
-        planDB.push("新建选配方案");
-        core.writeData(planDB, `${__dirname}/../databases/plan.json`);
-    }
-    return planDB;
-};
-
 let buildOrderList = (arr, $sce, $scope) => {
     let innerHtml = "", sequence = 0, max_sequence = colorTag.length - 1, value;
     for (let type of arr) {
@@ -191,6 +181,64 @@ let transformValue = (value, label) => {
         return value.key;
 };
 
+let partType = () => {
+    let _arr = new Array("请选择产品"), part = db.get("part"), _type;
+    for (let [key,value] of db.get("part").entries()) {
+        _type = value.model;
+        if (!_arr.find(__type => _type === __type)) _arr.push(_type);
+    }
+    return _arr;
+};
+
+let findBOM = produce => {
+    let bom = new Array();
+    for (let [key,value] of db.get("part").entries()) {
+        if (produce === value.model) {
+            if (!bom.find(_part => _part.type === value.type && _part.level === value.level - 1))
+                bom.push({
+                    type: value.type,
+                    level: value.level - 1,
+                    partNum: value.partNum
+                });
+        }
+    }
+    return bom;
+};
+
+let renderBOM = bom => {
+    let bomHtml = "";
+    bom.forEach(_part => {
+        bomHtml += `<h3 class="col-md-offset-${_part.level}"><span class="label ${colorTag[_part.level]}">${_part.type}</span></h3>`;
+    });
+    return bomHtml;
+};
+
+let getPartsList = produce => {
+    let group = new Array();
+    for (let [key,value] of db.get("part").entries()) {
+        if (produce === value.model) {
+            if (!group.find(_part => _part.name === value.type))
+                group.push({
+                    name: value.type
+                });
+        }
+    }
+    return group;
+};
+
+let findParts = (produce,type) => {
+    let partList = new Array();
+    for (let [key,value] of db.get("part").entries()) {
+        if (produce === value.model && type === value.type) {
+            partList.push({
+                id : value.partNum,
+                value : `Part|No - ${value.partNum}`
+            });
+        }
+    }
+    return partList;
+};
+
 let GreeApp = angular.module('GreeApp', ['ngAnimate', 'ui.bootstrap']);
 
 GreeApp.controller("optionalListCtr", ['$scope', '$rootScope', '$selectPlain', '$uibModal', '$sce', ($scope, $rootScope, $selectPlain, $uibModal, $sce) => {
@@ -239,10 +287,10 @@ GreeApp.controller("selectCaseCtr", ['$scope', '$rootScope', '$sce', '$selectPla
         if (conditions.length > 0) { // 如果条件存在 则循环删除个个command的信息
             $scope.commands.forEach(control => {
                 conditions.forEach(condition => {
-                    if(control.name === condition.target){
+                    if (control.name === condition.target) {
                         _flag = (value >= condition.min && value <= condition.max);
                         flagArr.push(_flag);
-                        if(_flag){
+                        if (_flag) {
                             control.options.options = getOptions(condition.target, condition.rang);
                             if (control.options.options.length > 0) {
                                 control.options.selected = control.options.options[0];
@@ -252,10 +300,10 @@ GreeApp.controller("selectCaseCtr", ['$scope', '$rootScope', '$sce', '$selectPla
                         }
                     }
                 });
-                if(flagArr.length > 0) {
+                if (flagArr.length > 0) {
                     let flag = false;
                     flagArr.forEach(_flag => _flag ? flag = true : null);
-                    if(!flag){
+                    if (!flag) {
                         control.options.options = new Array();
                         control.options.selected = {};
                         control.error = true;
@@ -272,7 +320,7 @@ GreeApp.controller("selectCaseCtr", ['$scope', '$rootScope', '$sce', '$selectPla
         for (let command of $scope.commands) {
             solutionPlane.push({
                 id: command.id,
-                key : command.options.selected.key,
+                key: command.options.selected.key,
                 selected: command.options.selected
             });
         }
@@ -280,9 +328,9 @@ GreeApp.controller("selectCaseCtr", ['$scope', '$rootScope', '$sce', '$selectPla
         $selectPlain.setSelectPlan(solutionPlane);
         $rootScope.$broadcast("optionalList");
         // 写出指定位置写出XML
-        utilContr.noticeMaster("writeSelectedData",{
-            name : "xxx",
-            data : solutionPlane
+        utilContr.noticeMaster("writeSelectedData", {
+            name: "xxx",
+            data: solutionPlane
         });
     };
 
@@ -296,68 +344,35 @@ GreeApp.controller("selectCaseCtr", ['$scope', '$rootScope', '$sce', '$selectPla
  * 选择配置方案 控制器
  */
 GreeApp.controller("selectPlanCtr", ['$scope', '$sce', '$uibModal', '$log', '$rootScope', '$selectPlain', ($scope, $sce, $uibModal, $log, $rootScope, $selectPlain) => {
-    $scope.commands = buildCommands();
 
-    $scope.updateDB = () => {
-        location.reload();
+    $scope.products = {
+        options: partType(),
+        selected: "请选择产品"
     };
-    $scope.dbCommandsNumber = $scope.commands.length;
-    $scope.planNumber = planDB ? planDB.length - 2 : 0;
 
     $scope.TrustDangerousSnippet = snippet => $sce.trustAsHtml(snippet);
 
-    $scope.loadPlain = plainName => {
-        let obj = core.readJson(`${__dirname}/../databases/${plainName}.plan`), innerHtml;
-        $scope.assemblyPlain = '';
-        if (obj) {
-            let commandList = new Array();
-            innerHtml = ``;
-            obj.forEach(command => {
-                innerHtml += command.tagDom;
-                commandList.push(command.data);
-            });
-            $selectPlain.setPlanName(plainName);
-            $selectPlain.setPlan(commandList);
-            $scope.btn_select = true;
-            $scope.btn_save = false;
-            $scope.assemblyPlain = innerHtml;
-        } else {
-            if ("新建选配方案" === plainName) {
-                $scope.btn_create = false;
-                $scope.btn_select = false;
-                $scope.btn_save = true;
-            } else {
-                $scope.btn_save = false;
-                $scope.btn_select = false;
-            }
-            $scope.assemblyPlain = ``;
-        }
+    $scope.loadBom = selected => {
+        $scope.bom = renderBOM(findBOM(selected));
+        $scope.partGroups = getPartsList(selected);
+        $scope.selected = selected;
     };
 
+    $scope.changeLi = (index, type) => {
+        $scope.partGroups.forEach(_group => {
+            _group.active = false;
+            _group.parts = null;
+        });
+        $scope.partGroups[index].active = true;
+        $scope.partGroups[index].parts = findParts($scope.selected,type);
+    };
+
+    // TODO
+    console.log(db);
+    $scope.productsNum = 2;
     $scope.selectFile = openFile;
-    $scope.configurationPlan = {
-        options: readConfigPlan(),
-        selected: '选择装配方案'
-    };
-    $scope.assemblyPlain = `<br/>`;
-
-    $scope.saveConfigurationPlan = () => {
-        let modalInstance = $uibModal.open({
-            animation: true,
-            templateUrl: 'myModalContent.html',
-            controller: 'ModalInstanceCtrl',
-            size: undefined
-        });
-
-        modalInstance.result.then(planName => {
-            core.writeData(newItem, `${__dirname}/../databases/${planName}.plan`);
-            planDB.push(planName);
-            core.writeData(planDB, `${__dirname}/../databases/plan.json`);
-            $scope.btn_select = true;
-            $scope.btn_save = false;
-        }, () => {
-            $log.info('Modal dismissed at: ' + new Date());
-        });
+    $scope.updateDB = () => {
+        location.reload();
     };
 
     $scope.nextStep = planName => {

@@ -4,9 +4,10 @@
 const WTObject = require(`${__dirname}/wtObject`);
 
 class WTOptionSet extends WTObject {
-    constructor(label,option){
+    constructor(label,model,option){
         super();
         this.label = label;
+        this.model = model;
         this.options = this.buildRange(option);
     }
 

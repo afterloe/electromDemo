@@ -1,45 +1,9 @@
 /**
  * Created by afterloe on 16-1-7.
  */
-const [fs,uuid,dBug,dataPath,Condition] = [require("fs"), require('node-uuid'), true, `${process.env.APPDATA}/EngineeringWhite`, require("../domain/condition")];
+const [fs,uuid,dBug,dataPath,InnoDB] = [require("fs"), require('node-uuid'), true, `${process.env.APPDATA}/EngineeringWhite`, require(`${__dirname}/../domain/innoDB`)];
 
-let conditionBuilder = table => {
-    let _condition;
-    table.forEach((_item, _index) => {
-        if(0 === _index) return;
-        _condition = new WTCondition(_item[0],_item[1],_item[2],_item[3],_item[4]);
-        console.log(_condition.toString());
-    });
-};
-
-let partBuilder = table => {
-    let _softProperty,_part;
-    table.forEach((_item, _index) => {
-        if(0 === _index) {
-            _softProperty = _item;
-            return;
-        }
-        _part = new WTPart(_item[0],_item[1],_item[2],_item[3]);
-        _item.forEach((__data,__index) => {
-            if(__index < 3) return;
-            _part[_softProperty[__index]] = __data;
-        });
-        // TODO 需要处理 产生的_part 的 WTPart
-        console.log(_part.toString());
-    });
-};
-
-let optionsBuilder = table => {
-    //WTOptionSet
-    let _option;
-    table.forEach((_item, _index) => {
-        if(0 === _index) return;
-        _option = new WTOptionSet(_item[0], _item[1]);
-        console.log(_option.toString());
-    });
-};
-
-let [userDir,readVersionInfo,deleteFile,uploadMateSite,updateLoinInfos,postFiles,randomCode,readUserInfo,vers,result,writeJournal,getTime,formatDate,getDataPath,writeData,getDateBase,constructionTable,constructionCondition] = [
+let [userDir,readVersionInfo,deleteFile,uploadMateSite,updateLoinInfos,postFiles,randomCode,readUserInfo,vers,result,writeJournal,getTime,formatDate,getDataPath,writeData,getDateBase,constructionTable] = [
 /**
  * userDir
  *
@@ -337,23 +301,15 @@ let [userDir,readVersionInfo,deleteFile,uploadMateSite,updateLoinInfos,postFiles
  *
  * 构建数据表
  */
-    table => {
-        // TODO
-        let classObject = new Object(), datas = table.data, dataItem, tableMap = new Object();
-        datas.forEach((item, index) => {
-            if (0 === index) {
-                item.forEach(value => {
-                    classObject[value] = null; // 构建表的schema
-                });
-            } else {
-                dataItem = new Object();
-                Object.keys(classObject).forEach((key, value) => {
-                    dataItem[key] = item[value]; // 将零散的数据组成表数据
-                });
-                tableMap[index] = dataItem;
-            }
+    xlsx => {
+        let db = new Object(), _tableName, builder;
+        xlsx.forEach(_table => {
+            _tableName = _table.name;
+            builder = `${_tableName}Builder`;
+            if(InnoDB[builder])
+                db[_tableName] = InnoDB[builder].apply(InnoDB,[_table.data]);
         });
-        return tableMap;
+        return db;
     }
 ];
 

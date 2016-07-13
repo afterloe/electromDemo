@@ -17,3 +17,35 @@
 .thumbnail > img {
     max-height: 280px;
 }
+
+.btn-next {
+    border: 1px solid rgba(65,98,124,1.0);
+    background-color: rgba(65,98,124,1.0);
+}
+
+.btn-next:hover {
+    border: 1px solid rgba(32,85,128,1.0);
+    background-color: rgba(32,85,128,1.0);
+}
+
+.btn-lode {
+    border: 1px solid rgba(28,40,89,1.0);
+    background-color: rgba(28,40,89,1.0);
+}
+
+.part-simple {
+    color: #337ab7;
+    line-height: 30px;
+    text-decoration: none;
+    background-color: transparent;
+    font-size: 16px;
+}
+
+.part-simple:hover {
+    cursor: pointer;
+    color:rgba(26,21,43,1.0);
+    background-color: #eee;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}

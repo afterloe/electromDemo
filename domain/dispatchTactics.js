@@ -100,11 +100,8 @@ class DispatchTactics {
     }
 
     uploadDatabases(param, callback) {
-        let data = xlsx.parse(param.filePath), databases = new Object();
-        for (let table of data) {
-            databases[table.name] = core.constructionTable(table);
-        }
-        core.writeData(databases, `${__dirname}/../databases/gree.db`);
+        let data = xlsx.parse(param.filePath);
+        core.writeData(core.constructionTable(data), `${__dirname}/../databases/gree.db`);
         if (callback) callback(null, "uploadDatabases");
     }
 }

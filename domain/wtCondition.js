@@ -4,9 +4,10 @@
 const WTObject = require(`${__dirname}/wtObject`);
 
 class WTCondition extends WTObject{
-    constructor(primary,selected,rule,foreign,range){
+    constructor(primary,model,selected,rule,foreign,range){
         super();
         this.primary = primary;
+        this.model = model;
         this.foreign = foreign;
         this.rule = rule;
         this.selected = selected;
