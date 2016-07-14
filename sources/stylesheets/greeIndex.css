@@ -49,3 +49,9 @@
     -moz-border-radius: 3px;
     border-radius: 3px;
 }
+
+.btn-primary.active, .btn-primary.focus, .btn-primary:active, .btn-primary:focus, .btn-primary:hover, .open>.dropdown-toggle.btn-primary {
+    color: #fff;
+    background-color: rgba(41,44,46,1.0);
+    border-color: rgba(41,44,46,1.0);
+}

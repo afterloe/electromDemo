@@ -18,7 +18,7 @@ let allowDrop = ev => ev.preventDefault();
 
 let drag = ev => ev.dataTransfer.setData("modelName", ev.path[0].innerText);
 
-let drop = (ev) => {
+let drop = ev => {
     ev.preventDefault();
     let modelName = ev.dataTransfer.getData("modelName"), level = Number.parseInt(ev.path[1].className.substring(ev.path[1].className.length - 1)) + 1,
         partHtml = `<h3 class="col-md-offset-${level}" ondrop="drop(event,'source')" ondragover="allowDrop(event)"><span class="label ${colorTag[level]}">${modelName}</span></h3>`;
@@ -42,44 +42,8 @@ let selectPlan = function (tabNumber) {
             this.selectCase = true;
             this.optionalList = false;
             break;
-        case 4 :
-            this.selectPlan = true;
-            this.selectCase = true;
-            this.selectBlower = true;
-            this.selectElectricalBox = false;
-            this.selectEvaporator = true;
-            this.optionalList = true;
-            break;
-        case 5 :
-            this.selectPlan = true;
-            this.selectCase = true;
-            this.selectBlower = true;
-            this.selectElectricalBox = true;
-            this.selectEvaporator = false;
-            this.optionalList = true;
-            break;
-        case 6 :
-            this.selectPlan = true;
-            this.selectCase = true;
-            this.selectBlower = true;
-            this.selectElectricalBox = true;
-            this.selectEvaporator = true;
-            this.optionalList = false;
-            break;
-    }
-};
 
-let assemblyCommands = item => {
-    let options = new Array();
-    for (let value of item.values()) {
-        options.push({
-            key: value["id"],
-            value: core.values(value, 0)
-        });
     }
-    return {
-        options, selected: options[0]
-    };
 };
 
 utilContr.resSystemInfo("uploadDatabases", (err, tacticBlock, data) => {
@@ -143,76 +107,115 @@ let transformValue = (value, label) => {
 
 let partType = () => {
     let _arr = new Array("请选择产品"), _type;
-    for (let [key,value] of db.get("part").entries()) {
-        _type = value.model;
-        if (!_arr.find(__type => _type === __type)) _arr.push(_type);
+    try {
+        for (let [key,value] of db.get("part").entries()) {
+            _type = value.model;
+            if (!_arr.find(__type => _type === __type)) _arr.push(_type);
+        }
+    } catch (err) {
+        console.log(err);
     }
     return _arr;
 };
 
 let findBOM = produce => {
     let bom = new Array();
-    for (let [key,value] of db.get("part").entries()) {
-        if (produce === value.model) {
-            if (!bom.find(_part => _part.type === value.type && _part.level === value.level - 1))
-                bom.push({
-                    type: value.type,
-                    level: value.level - 1,
-                    partNum: value.partNum
-                });
+    try {
+        for (let [key,value] of db.get("part").entries()) {
+            if (produce === value.model) {
+                if (!bom.find(_part => _part.type === value.type && _part.level === value.level - 1))
+                    bom.push({
+                        type: value.type,
+                        level: value.level - 1,
+                        partNum: value.partNum
+                    });
+            }
         }
+    } catch (err) {
+        console.log(err);
     }
     return bom;
 };
 
 let renderBOM = bom => {
     let bomHtml = "";
-    bom.forEach(_part => {
-        bomHtml += `<h3 class="col-md-offset-${_part.level}" ondrop="drop(event,'source')" ondragover="allowDrop(event)"><span class="label ${colorTag[_part.level]}">${_part.type}</span></h3>`;
-    });
+    try {
+        bom.forEach(_part => {
+            bomHtml += `<h3 class="col-md-offset-${_part.level}" ondrop="drop(event,'source')" ondragover="allowDrop(event)"><span class="label ${colorTag[_part.level]}">${_part.type}</span></h3>`;
+        });
+    } catch (err) {
+        console.log(err);
+    }
     return bomHtml;
 };
 
 let getPartsList = produce => {
     let group = new Array();
-    for (let [key,value] of db.get("part").entries()) {
-        if (produce === value.model) {
-            if (!group.find(_part => _part.name === value.type))
-                group.push({
-                    name: value.type
-                });
+    try {
+        for (let [key,value] of db.get("part").entries()) {
+            if (produce === value.model) {
+                if (!group.find(_part => _part.name === value.type))
+                    group.push({
+                        name: value.type
+                    });
+            }
         }
+    } catch (err) {
+        console.log(err);
     }
     return group;
 };
 
-let findParts = (produce,type) => {
+let findParts = (produce, type) => {
     let partList = new Array();
-    for (let [key,value] of db.get("part").entries()) {
-        if (produce === value.model && type === value.type) {
-            partList.push({
-                id : value.partNum,
-                value : `Part|No - ${value.partNum}`
-            });
+    try {
+        for (let [key,value] of db.get("part").entries()) {
+            if (produce === value.model && type === value.type) {
+                partList.push({
+                    id: value.partNum,
+                    enable: false,
+                    value: `Part|No - ${value.partNum}`
+                });
+            }
         }
+    } catch (err) {
+        console.log(err);
     }
     return partList;
 };
 
-let buildCommands = bomList => {
+let buildCommands = (produce, bomList) => {
     let _commandList = new Array();
-    // TODO
-    if(bomList && bomList instanceof Array) {
-        bomList.forEach(__bom => {
+    try {
+        bomList.forEach(_bom => {
             _commandList.push({
-                error : false,
-                name : __bom.type,
-                options : ["1","2","3"],
-                selected : "1"
+                name: _bom.type,
+                selected: _bom.type,
+                options: findParts(produce, _bom.type)
             });
         });
+    } catch (err) {
+        console.log(err);
     }
     return _commandList;
+};
+
+let queryOptionSets = produce => {
+    let _optionSets = new Array();
+    try {
+        for (let [key,value] of db.get("options").entries()) {
+            if (produce === value.model) {
+                _optionSets.push({
+                    name: value.label,
+                    options: value.options,
+                    model: value.label
+                });
+            }
+        }
+    } catch (err) {
+        console.log(err);
+    }
+    return _optionSets;
 };
 
 let GreeApp = angular.module('GreeApp', ['ngAnimate', 'ui.bootstrap']);
@@ -312,8 +315,13 @@ GreeApp.controller("selectCaseCtr", ['$scope', '$rootScope', '$sce', '$selectPla
 
     $rootScope.$on("loadPlanInSelection", () => {
         $scope.sourcePlan = false;
-        $scope.commands = buildCommands($selectPlain.getPlan());
+        $scope.commands = buildCommands($selectPlain.getProduce(), $selectPlain.getPlan());
+        $scope.optionSets = queryOptionSets($selectPlain.getProduce());
     });
+
+    $scope.clickOption = model => {
+        console.log(model);
+    }
 }]);
 
 /**
@@ -333,7 +341,7 @@ GreeApp.controller("selectPlanCtr", ['$scope', '$sce', '$uibModal', '$log', '$ro
         let bomObject = findBOM(selected);
         $scope.bom = renderBOM(bomObject);
         $scope.partGroups = getPartsList(selected);
-        $scope.selected = selected;
+        $selectPlain.setProduce(selected);
         $selectPlain.setPlan(bomObject);
     };
 
@@ -343,7 +351,7 @@ GreeApp.controller("selectPlanCtr", ['$scope', '$sce', '$uibModal', '$log', '$ro
             _group.parts = null;
         });
         $scope.partGroups[index].active = true;
-        $scope.partGroups[index].parts = findParts($scope.selected,type);
+        $scope.partGroups[index].parts = findParts($selectPlain.getProduce(), type);
         $scope.partGroups[index].number = $scope.partGroups[index].parts.length;
     };
 
@@ -360,7 +368,7 @@ GreeApp.controller("selectPlanCtr", ['$scope', '$sce', '$uibModal', '$log', '$ro
 
 
 GreeApp.service('$selectPlain', function () {
-    let plan = '', selectPlan = '', planName = '';
+    let plan , selectPlan , planName , produce;
     return {
         getPlan: () => {
             return plan;
@@ -379,6 +387,12 @@ GreeApp.service('$selectPlain', function () {
         },
         setPlanName: value => {
             planName = value;
+        },
+        setProduce: value => {
+            produce = value;
+        },
+        getProduce: () => {
+            return produce;
         }
     };
 });
@@ -398,11 +412,13 @@ GreeApp.controller("GreeCtrl", ['$scope', '$rootScope', ($scope, $rootScope) => 
 
     $rootScope.$on("nextPlan", () => {
         $scope.planNumber++;
+        $scope.dynamic += 33;
         selectPlan.apply($scope, [$scope.planNumber]);
     });
 
     $rootScope.$on("backPlan", () => {
         $scope.planNumber--;
+        $scope.dynamic -= 33;
         selectPlan.apply($scope, [$scope.planNumber]);
     });
 }]);

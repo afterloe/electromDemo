@@ -8,17 +8,16 @@
 <!-- #include virtual = "../views/public/head.html" 引入控制窗口头 -->
 <div ng-include="'../views/public/head.html'"></div>
 
+<!-- 占位顶格 -->
+<div style="height: 30px"></div>
 <!-- 选型步骤导航 -->
 <ul class="nav nav-tabs nav-justified">
     <li ng-class="{'active': !selectPlan}"><a ng-click="selectTab(1)">选择装备方案</a></li>
     <li ng-class="{'active': !selectCase}"><a ng-click="selectTab(2)">配置单</a></li>
-    <!--<li ng-class="{'active': !selectBlower}"><a ng-click="selectTab(3)">风机部件</a></li>-->
-    <!--<li ng-class="{'active': !selectElectricalBox}"><a ng-click="selectTab(4)">电器盒部件</a></li>-->
-    <!--<li ng-class="{'active': !selectEvaporator}"><a ng-click="selectTab(5)">蒸发器部件</a></li>-->
     <li ng-class="{'active': !optionalList}"><a ng-click="selectTab(3)">总清单</a></li>
 </ul>
 <!-- 进度条 -->
-<uib-progressbar class="progress-striped active" value="dynamic" type="success">{{dynamic}}% <i
+<uib-progressbar class="progress-striped active" value="dynamic" type="info">{{dynamic}}% <i
         ng-show="showWarning">wait input</i></uib-progressbar>
 
 <div class="container">
@@ -54,10 +53,11 @@
         <div class="col-md-8" ng-include src="'command.html'"></div>
         <div class="row">
             <div class="col-md-6 col-md-offset-5">
-                <button type="button" class="btn btn-danger" ng-disabled="sourcePlan" ng-click="break(1)">
+                <button type="button" class="btn btn-info" ng-disabled="sourcePlan" ng-click="break(1)">
                     <span class="glyphicon glyphicon-chevron-left"></span> 返回
                 </button>
-                <button type="button" class="btn btn-success" ng-disabled="sourcePlan" ng-click="exportSelect()"><span
+                <button type="button" class="btn btn-primary btn-lode" ng-disabled="sourcePlan"
+                        ng-click="exportSelect()"><span
                         class="glyphicon glyphicon-export"></span> 确认选型
                 </button>
             </div>
@@ -162,14 +162,24 @@
 </script>
 
 <script type="text/ng-template" id="command.html">
-    <ng-repeat ng-repeat="command in commands">
-        <div class="form-group" ng-class="{'has-error' : command.error}">
-            <label class="dropPrompt">{{command.name}}</label>
-            <select class="form-control" ng-model="command.selected"
-                    ng-options="o as o for o in command.options"
-                    ng-change="checkOthers(command.options,command.name)"></select>
+    <!-- 选项 -->
+    <div class="row" ng-repeat="optionSet in optionSets">
+        <h4>{{optionSet.name}}选择：</h4>
+
+        <div class="btn-group" ng-repeat="option in optionSets[$index].options">
+            <label class="btn btn-warning" ng-model="optionSet.model" uib-btn-radio="option"
+                   ng-click="clickOption(optionSet)">{{option}}</label>
         </div>
-    </ng-repeat>
+    </div>
+
+    <div class="row" ng-repeat="command in commands">
+        <h4>{{command.name}}
+            <small>{{command.selected}}</small>
+        </h4>
+        <div class="btn-group" ng-repeat="pr in commands[$index].options">
+            <label class="btn btn-primary" ng-model="command.selected" uib-btn-radio="pr.id" ng-disabled="!pr.enable">{{pr.value}}</label>
+        </div>
+    </div>
 </script>
 
 </body>
