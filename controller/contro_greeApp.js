@@ -218,6 +218,18 @@ let queryOptionSets = produce => {
     return _optionSets;
 };
 
+let queryRelatedSets = (produce, execute) => {
+    let relatedSets = new Array();
+    try {
+        for (let [key,value] of db.get("condition").entries()) {
+            if (execute === value.primary && produce === value.model) relatedSets.push(value);
+        }
+    } catch (err) {
+        console.log(err);
+    }
+    return relatedSets;
+};
+
 let GreeApp = angular.module('GreeApp', ['ngAnimate', 'ui.bootstrap']);
 
 GreeApp.controller("optionalListCtr", ['$scope', '$rootScope', '$selectPlain', '$uibModal', '$sce', ($scope, $rootScope, $selectPlain, $uibModal, $sce) => {
@@ -261,38 +273,23 @@ GreeApp.controller("selectCaseCtr", ['$scope', '$rootScope', '$sce', '$selectPla
         $rootScope.$broadcast("backPlan");
     };
 
-    $scope.checkOthers = (selectOption, label) => {
-        let conditions = getConditionsByName(label), value = transformValue(selectOption.selected, label), flagArr = new Array(), _flag;
-        if (conditions.length > 0) { // 如果条件存在 则循环删除个个command的信息
-            $scope.commands.forEach(control => {
-                conditions.forEach(condition => {
-                    if (control.name === condition.target) {
-                        _flag = (value >= condition.min && value <= condition.max);
-                        flagArr.push(_flag);
-                        if (_flag) {
-                            control.options.options = getOptions(condition.target, condition.rang);
-                            if (control.options.options.length > 0) {
-                                control.options.selected = control.options.options[0];
-                                control.error = false;
-                            } else
-                                control.error = true;
+    $scope.clickOption = model => {
+        console.log(model);
+        console.log($scope.commands);
+        let relatedSets = queryRelatedSets($selectPlain.getProduce(), model.name);
+        $scope.commands.forEach(command => {
+            relatedSets.forEach(related => {
+                if(command.name === related.primary){
+                    command.options.forEach(option => {
+                        if(related.range.find(r => r == option.id)){
+                            option.enable = true;
                         }
-                    }
-                });
-                if (flagArr.length > 0) {
-                    let flag = false;
-                    flagArr.forEach(_flag => _flag ? flag = true : null);
-                    if (!flag) {
-                        control.options.options = new Array();
-                        control.options.selected = {};
-                        control.error = true;
-                    }
+                        option.enable = false;
+                    });
                 }
             });
-        }
+        });
     };
-
-    $scope.selectChange = dom => console.log(dom);
 
     $scope.exportSelect = () => {
         let solutionPlane = new Array();
@@ -318,10 +315,6 @@ GreeApp.controller("selectCaseCtr", ['$scope', '$rootScope', '$sce', '$selectPla
         $scope.commands = buildCommands($selectPlain.getProduce(), $selectPlain.getPlan());
         $scope.optionSets = queryOptionSets($selectPlain.getProduce());
     });
-
-    $scope.clickOption = model => {
-        console.log(model);
-    }
 }]);
 
 /**
@@ -368,7 +361,7 @@ GreeApp.controller("selectPlanCtr", ['$scope', '$sce', '$uibModal', '$log', '$ro
 
 
 GreeApp.service('$selectPlain', function () {
-    let plan , selectPlan , planName , produce;
+    let plan, selectPlan, planName, produce;
     return {
         getPlan: () => {
             return plan;

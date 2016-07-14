@@ -7,7 +7,7 @@ class WTObject {
 
     buildRange(value){
         let _arr = value.match(regex);
-        return _arr ? _arr[0].split(",") : null;
+        return _arr ? _arr[0].split(",") : new Array();
     }
 
     toString(){
