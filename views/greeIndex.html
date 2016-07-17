@@ -174,7 +174,7 @@
 
     <div class="row" ng-repeat="command in commands">
         <h4>{{command.name}}
-            <small>{{command.selected}}</small>
+            <small ng-if="command.selected">Part|No - {{command.selected}}</small>
         </h4>
         <div class="btn-group" ng-repeat="pr in commands[$index].options">
             <label class="btn btn-primary" ng-model="command.selected" uib-btn-radio="pr.id" ng-disabled="!pr.enable">{{pr.value}}</label>

@@ -42,7 +42,6 @@ let selectPlan = function (tabNumber) {
             this.selectCase = true;
             this.optionalList = false;
             break;
-
     }
 };
 
@@ -55,55 +54,27 @@ let openFile = () => {
     utilContr.noticeMaster("openFileDialog", {});
 };
 
-let buildOrderList = (arr, $sce, $scope) => {
-    let innerHtml = "", sequence = 0, max_sequence = colorTag.length - 1, value;
-    for (let type of arr) {
-        value = type.selected.value.join(" ");
-        innerHtml += `<h4><span class="label ${colorTag[sequence]}">${type.id}</span>
-                            <small class="pull-right">${value}</small>
-                        </h4>`;
-        if ("能力" == type.id) selectPic(value, $scope);
-        sequence == max_sequence ? sequence = 0 : sequence++;
+let buildOrderList = (ctrlListArr, $sce) => {
+    let innerHtml = "";
+    try {
+        let partTable = db.get("part"), sequence = 0, max_sequence = colorTag.length - 1;
+        ctrlListArr.forEach(ctrlList => {
+            let ctrl = partTable.get(ctrlList.id);
+            if (ctrl) {
+                innerHtml += `<p class="lead">
+            <h4><span class="label ${colorTag[sequence]}">${ctrlList.key}</span></h4>
+                ${JSON.stringify(ctrl)}
+            </p>`;
+                sequence >= max_sequence ? 0 : sequence += 1;
+            }
+        });
+    } catch (error) {
+        console.log(error);
     }
     return $sce.trustAsHtml(innerHtml);
 };
 
-let getConditionsByName = name => {
-    let condition = new Array();
-    for (let [key,value] of db.get("condition").entries()) {
-        if (name === value.execute) condition.push(value);
-    }
-    return condition;
-};
-
-let getOptions = (name, rang) => {
-    let table = db.get(name), options = new Array(), values;
-    rang.forEach(value => {
-        if ("string" == typeof value) value = Number.parseInt(value);
-        if (table.has(value)) {
-            values = table.get(value);
-            options.push({
-                key: value,
-                value: core.values(values, 0)
-            });
-        }
-    });
-    return options;
-};
-
-let selectPic = (value, $scope) => {
-// TODO
-//    $scope.selectRandom = "小壳体.png";
-//    $scope.selectRandom = "中壳体.png";
-    $scope.selectRandom = "大壳体.png";
-};
-
-let transformValue = (value, label) => {
-    if ("能力" === label)
-        return value.value[0];
-    else
-        return value.key;
-};
+let selectPic = (produce, value) => `${produce}_${value}.jpg`;
 
 let partType = () => {
     let _arr = new Array("请选择产品"), _type;
@@ -190,7 +161,6 @@ let buildCommands = (produce, bomList) => {
         bomList.forEach(_bom => {
             _commandList.push({
                 name: _bom.type,
-                selected: _bom.type,
                 options: findParts(produce, _bom.type)
             });
         });
@@ -218,16 +188,37 @@ let queryOptionSets = produce => {
     return _optionSets;
 };
 
-let queryRelatedSets = (produce, execute) => {
+let queryRelatedSets = (produce, selectedModel) => {
     let relatedSets = new Array();
     try {
         for (let [key,value] of db.get("condition").entries()) {
-            if (execute === value.primary && produce === value.model) relatedSets.push(value);
+            if (selectedModel.name === value.primary && produce === value.model && selectedModel.model == value.selected)
+                relatedSets.push(value);
         }
     } catch (err) {
         console.log(err);
     }
     return relatedSets;
+};
+
+let changeOptions = function (range) {
+    this.forEach(option => {
+        range.forEach(number => option.enable = false);
+        range.forEach(number => {
+            if (option.id == number)
+                option.enable = true;
+        });
+    });
+};
+
+let queryCtrls = function (optionSets) {
+    this.forEach(ctrl => {
+        optionSets.forEach(optionSet => {
+            if (ctrl.name === optionSet.foreign) {
+                changeOptions.apply(ctrl.options, [optionSet.range]);
+            }
+        });
+    });
 };
 
 let GreeApp = angular.module('GreeApp', ['ngAnimate', 'ui.bootstrap']);
@@ -238,8 +229,9 @@ GreeApp.controller("optionalListCtr", ['$scope', '$rootScope', '$selectPlain', '
 
     $rootScope.$on("optionalList", () => {
         $scope.selectPlan = false;
-        $scope.planName = $selectPlain.getPlanName();
+        $scope.planName = $selectPlain.getProduce();
         $scope.TrustDangerousSnippet = buildOrderList($selectPlain.getSelectPlan(), $sce, $scope);
+        $scope.selectRandom = selectPic($selectPlain.getProduce(), $selectPlain.getPlanName());
     });
 
     $scope.openPro = () => {
@@ -255,7 +247,7 @@ GreeApp.controller("optionalListCtr", ['$scope', '$rootScope', '$selectPlain', '
                 }
             }
         });
-
+        $rootScope.$broadcast("nextPlan");
         utilContr.noticeMaster("openProEngineer");
     };
 
@@ -274,40 +266,32 @@ GreeApp.controller("selectCaseCtr", ['$scope', '$rootScope', '$sce', '$selectPla
     };
 
     $scope.clickOption = model => {
-        console.log(model);
-        console.log($scope.commands);
-        let relatedSets = queryRelatedSets($selectPlain.getProduce(), model.name);
-        $scope.commands.forEach(command => {
-            relatedSets.forEach(related => {
-                if(command.name === related.primary){
-                    command.options.forEach(option => {
-                        if(related.range.find(r => r == option.id)){
-                            option.enable = true;
-                        }
-                        option.enable = false;
-                    });
-                }
-            });
-        });
+        let relatedSets = queryRelatedSets($selectPlain.getProduce(), model);
+        queryCtrls.apply($scope.commands, [relatedSets]);
     };
 
     $scope.exportSelect = () => {
         let solutionPlane = new Array();
-        for (let command of $scope.commands) {
+        for (let ctrl of $scope.commands) {
             solutionPlane.push({
-                id: command.id,
-                key: command.options.selected.key,
-                selected: command.options.selected
+                id: ctrl.selected,
+                key: ctrl.name
             });
+        }
+        for (let selected of $scope.optionSets) {
+            if ("外壳" === selected.name) $selectPlain.setPlanName(selected.model);
         }
         $rootScope.$broadcast("nextPlan");
         $selectPlain.setSelectPlan(solutionPlane);
         $rootScope.$broadcast("optionalList");
-        // 写出指定位置写出XML
-        utilContr.noticeMaster("writeSelectedData", {
+        /**
+         * 写出指定位置写出XML
+         *
+         utilContr.noticeMaster("writeSelectedData", {
             name: "xxx",
             data: solutionPlane
         });
+         **/
     };
 
     $rootScope.$on("loadPlanInSelection", () => {
@@ -404,13 +388,14 @@ GreeApp.controller("GreeCtrl", ['$scope', '$rootScope', ($scope, $rootScope) => 
     $scope.dynamic = 0;
 
     $rootScope.$on("nextPlan", () => {
-        $scope.planNumber++;
         $scope.dynamic += 33;
+        $scope.planNumber++;
+        if ($scope.planNumber > 3) return;
         selectPlan.apply($scope, [$scope.planNumber]);
     });
 
     $rootScope.$on("backPlan", () => {
-        $scope.planNumber--;
+        $scope.planNumber -= 1;
         $scope.dynamic -= 33;
         selectPlan.apply($scope, [$scope.planNumber]);
     });

@@ -1,6 +1,6 @@
 const [core,windowBuilder,fs,xlsx,exec,cheerio] = [require("../bin/core"), require("../domain/windowBuilder"), require("fs"), require("node-xlsx"), require('child_process').exec, require("cheerio")];
 
-const PRO_Engineer_BAT = `${__dirname}/../databases/pro3.0.bat.lnk`,
+const PRO_Engineer_BAT = `E:/pro3.0.bat.lnk`,
     PATH_MDLLOAD_XML = `${__dirname}/../databases/mdlload.xml`;
 
 class DispatchTactics {
