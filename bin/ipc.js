@@ -4,7 +4,7 @@
  * @mail afterloeliu@jwis.cn
  * @version 1.0.0
  */
-const [tacitcsTemplate,EasyHook,fs] = [require("../domain/dispatchTactics"), require("../domain/EasyHook"), require("fs")];
+const [tacitcsTemplate,EasyHook,fs] = [require("../domain/dispatchTactics"), require("../domain/easyHook"), require("fs")];
 let hookList = new Array();
 
 module.exports = electron => {
