@@ -32,44 +32,62 @@ let SmartPlant = angular.module('SmartPlant', ['ngAnimate', 'ui.bootstrap']);
 /**
  * 主页控制器
  */
-SmartPlant.controller("SmartPlantCtrl", ['$scope', '$postgres', ($scope, $postgres) => {
+SmartPlant.controller("SmartPlantCtrl", ['$scope', '$interval', '$postgres', ($scope, $interval, $postgres) => {
     require(`${__dirname}/../controller/contro_common`)($scope);
     $scope.timers = 0;
+    $scope.img = `${__dirname}/../sources/f382d63f8794a4c29f911ae80ff41bd5ac6e3949.gif`;
+
+    let changeList = () => {
+        if($scope.task) clearInterval($scope.task);
+        $scope.task = setInterval(() => {
+            $postgres.queryRealTimeEquipment({
+                ip : $scope.ip,
+                callback: (err, count, rows) => {
+                    $scope.timers += 1;
+                    if(count > 0)
+                        $scope.equipment = rows[0];
+                    $scope.$apply();
+                }
+            });
+        },500);
+    };
+
+    $scope.queryHistory = () => {
+        clearInterval($scope.task);
+        $scope.equipment = null;
+        $postgres.queryHistroyEquipment({
+            ip : $scope.ip,
+            callback: (err, count, rows) => {
+                if(count > 0)
+                    $scope.history = rows;
+                $scope.$apply();
+            }
+        });
+    };
+
+    $scope.queryRealTime = () => {
+        $scope.history = null;
+        changeList();
+    };
+
     dropEventTrigger.register((...args) => {
         let [ip] = args;
-        if ($scope.task) {
-            clearInterval($scope.task);
-        } else {
-            $scope.task = setInterval(() => {
-                $postgres.queryRealTimeEquipment({
-                    ip,
-                    callback: (err, count, rows) => {
-                        $scope.timers +=1;
-                        let equipment = new Object();
-                        equipment.ip = ip;
-                        equipment.timers = $scope.timers;
-                        equipment.count = count;
-                        equipment.rows = rows;
-                        $scope.equipment = equipment;
-                        $scope.$apply();
-                    }
-                });
-            },500);
-        }
+        $scope.ip = ip;
+        changeList();
     });
 
     // init factory EquipmentList
     $scope.equipmentList = [{
-        ip: "192.168.1.4",
+        ip: "192.168.1.2",
         name: "智能设备- 1"
     }, {
-        ip: "192.168.1.5",
+        ip: "192.168.1.3",
         name: "智能设备- 2"
     }, {
-        ip: "192.168.1.6",
+        ip: "192.168.1.4",
         name: "智能设备- 3"
     }, {
-        ip: "192.168.1.7",
+        ip: "192.168.1.5",
         name: "智能设备- 4"
     }];
 
@@ -98,6 +116,7 @@ SmartPlant.service('$postgres', function () {
         },
         queryHistroyEquipment: queryObject => {
             let {ip,callback} = queryObject;
+            if(!ip) return;
             pool.query(`${selectRealTime} WHERE ip = $1::text`, [ip], (_err, _result) => {
                 if (callback) callback.apply(_result, [_err, _result["rowCount"], _result["rows"]]);
             });

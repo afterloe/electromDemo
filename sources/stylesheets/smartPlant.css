@@ -9,3 +9,8 @@
     margin: 5px 0px 10px 0px;
     min-height: 50px;
 }
+
+.thumbnail {
+    max-height: 450px;
+    max-width: 300px;
+}

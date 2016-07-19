@@ -32,11 +32,80 @@
 <script type="text/javascript" src="../controller/contro_SmartPlant.js"></script>
 
 <script type="text/ng-template" id="EquipmentView.afterloe">
-    {{equipment}}
+    <div class="jumbotron" ng-if="ip">
+        <h1>智能设备 -- ip {{ip}}</h1>
+
+        <p><img src="{{img}}" alt="工厂实景" class="thumbnail"/></p>
+
+        <p ng-if="equipment">
+            设备名 : {{equipment.equimentname}}<br/>
+            xjc: {{equipment.xjc}}<br/>
+            yjc: {{equipment.yjc}}<br/>
+            zjc: {{equipment.zjc}}<br/>
+            xxd: {{equipment.xxd}}<br/>
+            yxd: {{equipment.yxd}}<br/>
+            zxd: {{equipment.zxd}}<br/>
+            xjd: {{equipment.xjd}}<br/>
+            yjd: {{equipment.yjd}}<br/>
+            zjd: {{equipment.zjd}}<br/>
+            daystoptime: {{equipment.daystoptime}}<br/>
+            nightruntime: {{equipment.nightruntime}}<br/>
+            nightstoptime: {{equipment.nightstoptime}}<br/>
+            f: {{equipment.f}}<br/>
+            s: {{equipment.s}}<br/>
+            dayruntime: {{equipment.dayruntime}}<br/>
+        </p>
+        <table ng-if="history" class="table table-hover">
+            <thead>
+            <tr>
+                <td>设备名</td>
+                <td>xjc</td>
+                <td>yjc</td>
+                <td>zjc</td>
+                <td>xxd</td>
+                <td>yxd</td>
+                <td>zxd</td>
+                <td>xjd</td>
+                <td>yjd</td>
+                <td>zjd</td>
+                <td>daystoptime</td>
+                <td>nightruntime</td>
+                <td>nightstoptime</td>
+                <td>f</td>
+                <td>s</td>
+                <td>dayruntime</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="tr in history">
+                <td>{{tr.equimentname}}</td>
+                <td>{{tr.xjc}}</td>
+                <td>{{tr.yjc}}</td>
+                <td>{{tr.zjc}}</td>
+                <td>{{tr.xxd}}</td>
+                <td>{{tr.yxd}}</td>
+                <td>{{tr.zxd}}</td>
+                <td>{{tr.xjd}}</td>
+                <td>{{tr.yjd}}</td>
+                <td>{{tr.zjd}}</td>
+                <td>{{tr.daystoptime}}</td>
+                <td>{{tr.nightruntime}}</td>
+                <td>{{tr.nightstoptime}}</td>
+                <td>{{tr.f}}</td>
+                <td>{{tr.s}}</td>
+                <td>{{tr.dayruntime}}</td>
+            </tr>
+            </tbody>
+        </table>
+        <p><a class="btn btn-primary btn-lg" href="#" role="button" ng-if="equipment"
+              ng-click="queryHistory()">查看历史数据</a><a class="btn btn-default btn-lg" href="#" role="button"
+                                                     ng-if="history" ng-click="queryRealTime()">查看实时数据</a></p>
+    </div>
 </script>
 
 <script type="text/ng-template" id="EquipmentList.afterloe">
-    <div class="media" ng-repeat="equipment in equipmentList" data-ip="{{equipment.ip}}" draggable="true" ondragstart="drag(event)">
+    <div class="media" ng-repeat="equipment in equipmentList" data-ip="{{equipment.ip}}" draggable="true"
+         ondragstart="drag(event)">
         <div class="media-left">
             <a href="#">
                 <img class="media-object" src="../sources/equipment.png" alt="智能设备">
