@@ -137,15 +137,27 @@ let getPartsList = produce => {
     return group;
 };
 
+let partSynopsis = part => {
+    let synopsis = "";
+    try {
+        Object.keys(part).forEach((key,index) => {
+            if(index == 5) synopsis = `${key} : ${part[key]}`;
+        });
+    } catch (err) {
+        console.log(err);
+    }
+    return synopsis;
+};
+
 let findParts = (produce, type) => {
     let partList = new Array();
     try {
-        for (let [key,value] of db.get("part").entries()) {
+        for (let [key,value = ""] of db.get("part").entries()) {
             if (produce === value.model && type === value.type) {
                 partList.push({
                     id: value.partNum,
                     enable: false,
-                    value: `Part|No - ${value.partNum}`
+                    value: `no.${value.partNum} ${partSynopsis(value)}`
                 });
             }
         }
@@ -302,7 +314,7 @@ GreeApp.controller("selectCaseCtr", ['$scope', '$rootScope', '$sce', '$selectPla
 }]);
 
 /**
- * 选择配置方案 控制器
+ * 选择产品方案 控制器
  */
 GreeApp.controller("selectPlanCtr", ['$scope', '$sce', '$uibModal', '$log', '$rootScope', '$selectPlain', ($scope, $sce, $uibModal, $log, $rootScope, $selectPlain) => {
 
