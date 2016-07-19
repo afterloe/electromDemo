@@ -40,6 +40,7 @@
 
         <p ng-if="equipment">
             设备名 : {{equipment.equimentname}}<br/>
+            运行设备组 : {{equipment.runporgname}}</br>
 			白班运行时间: {{equipment.dayruntime}}<br/>
             白班停止时间: {{equipment.daystoptime}}<br/>
             夜班运行时间: {{equipment.nightruntime}}<br/>
@@ -51,6 +52,7 @@
             <thead>
             <tr>
                 <td>设备名</td>
+                <td>运行设备组</td>
 				<td>白班运行时间</td>
                 <td>白班停止时间</td>
                 <td>夜班运行时间</td>
@@ -62,6 +64,7 @@
             <tbody>
             <tr ng-repeat="tr in history">
                 <td>{{tr.equimentname}}</td>
+                <td>{{tr.runporgname}}</td>
                 <td>{{tr.dayruntime}}</td>
                 <td>{{tr.daystoptime}}</td>
                 <td>{{tr.nightruntime}}</td>

@@ -26,7 +26,7 @@ let toDate = text => {
     } catch (err) {
         console.log(err);
     }
-    return "-";
+    return text;
 };
 
 let allowDrop = ev => ev.preventDefault();
@@ -95,6 +95,7 @@ SmartPlant.controller("SmartPlantCtrl", ['$scope', '$interval', '$postgres', ($s
     dropEventTrigger.register((...args) => {
         let [ip] = args;
         $scope.ip = ip;
+        $scope.history = null;
         changeList();
     });
 
@@ -127,7 +128,7 @@ SmartPlant.service('$postgres', function () {
         host: "47.89.29.77"
     });
 
-    const [selectRealTime,selectHistroy] = ["SELECT id,ip,equimentname,runporgname,daystoptime,nightruntime,f,s,dayruntime  FROM realtime", "SELECT id,ip,equimentname,runporgname,daystoptime,nightruntime,f,s,dayruntime FROM historic "];
+    const [selectRealTime,selectHistroy] = ["SELECT id,ip,equimentname,runporgname,daystoptime,dayruntime,f,s,nightruntime,nightstoptime FROM realtime", "SELECT id,ip,equimentname,runporgname,daystoptime,dayruntime,f,s,nightruntime,nightstoptime FROM historic "];
 
     return {
         queryRealTimeEquipment: queryObject => {
