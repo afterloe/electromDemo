@@ -22,7 +22,7 @@ let toDate = text => {
     try {
         if(null == text) throw new Error("null data");
         let data = new Date(text);
-        return core.formatDate(data);
+        return core.formatDate(data,"hh:mm:ss");
     } catch (err) {
         console.log(err);
     }
@@ -54,10 +54,10 @@ SmartPlant.controller("SmartPlantCtrl", ['$scope', '$interval', '$postgres', ($s
                 ip: $scope.ip,
                 callback: (err, count, rows) => {
                     if (count > 0) {
+                        rows[0]["dayruntime"] = toDate(rows[0]["dayruntime"]);
                         rows[0]["daystoptime"] = toDate(rows[0]["daystoptime"]);
                         rows[0]["nightruntime"] = toDate(rows[0]["nightruntime"]);
                         rows[0]["nightstoptime"] = toDate(rows[0]["nightstoptime"]);
-                        rows[0]["dayruntime"] = toDate(rows[0]["dayruntime"]);
                         $scope.equipment = rows[0];
                         $scope.$apply();
                     }
@@ -75,9 +75,9 @@ SmartPlant.controller("SmartPlantCtrl", ['$scope', '$interval', '$postgres', ($s
                 if (count > 0) {
                     rows.forEach(row => {
                         row["daystoptime"] = toDate(row["daystoptime"]);
+                        row["dayruntime"] = toDate(row["dayruntime"]);
                         row["nightruntime"] = toDate(row["nightruntime"]);
                         row["nightstoptime"] = toDate(row["nightstoptime"]);
-                        row["dayruntime"] = toDate(row["dayruntime"]);
                     });
                     $scope.equipment = null;
                     $scope.history = rows;
@@ -127,7 +127,7 @@ SmartPlant.service('$postgres', function () {
         host: "47.89.29.77"
     });
 
-    const [selectRealTime,selectHistroy] = ["SELECT id,ip,equimentname,runporgname,xjc,yjc,zjc,xxd,yxd,zxd,xjd,yjd,zjd,daystoptime,nightruntime,f,s,dayruntime  FROM realtime", "SELECT id,ip,equimentname,runporgname,xjc,yjc,zjc,xxd,yxd,zxd,xjd,yjd,zjd,daystoptime,nightruntime,f,s,dayruntime FROM historic "];
+    const [selectRealTime,selectHistroy] = ["SELECT id,ip,equimentname,runporgname,daystoptime,nightruntime,f,s,dayruntime  FROM realtime", "SELECT id,ip,equimentname,runporgname,daystoptime,nightruntime,f,s,dayruntime FROM historic "];
 
     return {
         queryRealTimeEquipment: queryObject => {
@@ -139,7 +139,7 @@ SmartPlant.service('$postgres', function () {
         queryHistroyEquipment: queryObject => {
             let {ip,callback, page = 0} = queryObject;
             if (!ip) return;
-            pool.query(`${selectHistroy} WHERE ip = $1::text LIMIT 30 offset $2::bigint`, [ip, page], (_err, _result) => {
+            pool.query(`${selectHistroy} WHERE ip = $1::text ORDER BY id DESC LIMIT 30 offset $2::bigint`, [ip, page], (_err, _result) => {
                 if (callback) callback.apply(_result, [_err, _result["rowCount"], _result["rows"]]);
             });
         },
