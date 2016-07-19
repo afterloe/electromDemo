@@ -10,6 +10,7 @@
 <div style="height: 30px;"></div>
 
 <div class="container">
+    <div class="row"></div>
     <div class="row">
         <div class="col-md-4">
             <small>拖拽设备到右侧即可查看设备实时数据</small>
@@ -39,41 +40,41 @@
 
         <p ng-if="equipment">
             设备名 : {{equipment.equimentname}}<br/>
-            xjc: {{equipment.xjc}}<br/>
-            yjc: {{equipment.yjc}}<br/>
-            zjc: {{equipment.zjc}}<br/>
-            xxd: {{equipment.xxd}}<br/>
-            yxd: {{equipment.yxd}}<br/>
-            zxd: {{equipment.zxd}}<br/>
-            xjd: {{equipment.xjd}}<br/>
-            yjd: {{equipment.yjd}}<br/>
-            zjd: {{equipment.zjd}}<br/>
-            daystoptime: {{equipment.daystoptime}}<br/>
-            nightruntime: {{equipment.nightruntime}}<br/>
-            nightstoptime: {{equipment.nightstoptime}}<br/>
-            f: {{equipment.f}}<br/>
-            s: {{equipment.s}}<br/>
-            dayruntime: {{equipment.dayruntime}}<br/>
+            机床X坐标: {{equipment.xjc}}<br/>
+            机床Y坐标: {{equipment.yjc}}<br/>
+            机床Z坐标: {{equipment.zjc}}<br/>
+            X轴相对坐标: {{equipment.xxd}}<br/>
+            Y轴相对坐标: {{equipment.yxd}}<br/>
+            Z轴相对坐标: {{equipment.zxd}}<br/>
+            X轴绝对坐标: {{equipment.xjd}}<br/>
+            Y轴绝对坐标: {{equipment.yjd}}<br/>
+            Z轴绝对坐标: {{equipment.zjd}}<br/>
+            白班停止时间: {{equipment.daystoptime}}<br/>
+            夜班运行时间: {{equipment.nightruntime}}<br/>
+            夜班停止时间: {{equipment.nightstoptime}}<br/>
+            当前进给率: {{equipment.f}}<br/>
+            主轴转速: {{equipment.s}}<br/>
+            白班运行时间: {{equipment.dayruntime}}<br/>
         </p>
         <table ng-if="history" class="table table-hover">
             <thead>
             <tr>
                 <td>设备名</td>
-                <td>xjc</td>
-                <td>yjc</td>
-                <td>zjc</td>
-                <td>xxd</td>
-                <td>yxd</td>
-                <td>zxd</td>
-                <td>xjd</td>
-                <td>yjd</td>
-                <td>zjd</td>
-                <td>daystoptime</td>
-                <td>nightruntime</td>
-                <td>nightstoptime</td>
-                <td>f</td>
-                <td>s</td>
-                <td>dayruntime</td>
+                <td>机床X坐标</td>
+                <td>机床Y坐标</td>
+                <td>机床Z坐标</td>
+                <td>X轴相对坐标</td>
+                <td>Y轴相对坐标</td>
+                <td>Z轴相对坐标</td>
+                <td>X轴绝对坐标</td>
+                <td>Y轴绝对坐标</td>
+                <td>Z轴绝对坐标</td>
+                <td>白班停止时间</td>
+                <td>夜班运行时间</td>
+                <td>夜班停止时间</td>
+                <td>当前进给率</td>
+                <td>主轴转速</td>
+                <td>白班运行时间</td>
             </tr>
             </thead>
             <tbody>
@@ -97,6 +98,23 @@
             </tr>
             </tbody>
         </table>
+        <nav>
+            <ul class="pagination" ng-hide="!history">
+                <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+                </li>
+                <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
+                <li><a href="#">2 <span class="sr-only">(current)</span></a></li>
+                <li><a href="#">3 <span class="sr-only">(current)</span></a></li>
+                <li><a href="#">4 <span class="sr-only">(current)</span></a></li>
+                <li><a href="#">5 <span class="sr-only">(current)</span></a></li>
+                <li><a href="#">6 <span class="sr-only">(current)</span></a></li>
+                <li>
+                    <a href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
         <p><a class="btn btn-primary btn-lg" href="#" role="button" ng-if="equipment"
               ng-click="queryHistory()">查看历史数据</a><a class="btn btn-default btn-lg" href="#" role="button"
                                                      ng-if="history" ng-click="queryRealTime()">查看实时数据</a></p>

@@ -16,8 +16,18 @@ let dropEventTrigger = (() => {
             });
         }
     };
-
 })();
+
+let toDate = text => {
+    try {
+        if(null == text) throw new Error("null data");
+        let data = new Date(text);
+        return core.formatDate(data);
+    } catch (err) {
+        console.log(err);
+    }
+    return "-";
+};
 
 let allowDrop = ev => ev.preventDefault();
 
@@ -34,33 +44,45 @@ let SmartPlant = angular.module('SmartPlant', ['ngAnimate', 'ui.bootstrap']);
  */
 SmartPlant.controller("SmartPlantCtrl", ['$scope', '$interval', '$postgres', ($scope, $interval, $postgres) => {
     require(`${__dirname}/../controller/contro_common`)($scope);
-    $scope.timers = 0;
+    $scope.page = 0;
     $scope.img = `${__dirname}/../sources/f382d63f8794a4c29f911ae80ff41bd5ac6e3949.gif`;
 
     let changeList = () => {
-        if($scope.task) clearInterval($scope.task);
+        if ($scope.task) clearInterval($scope.task);
         $scope.task = setInterval(() => {
             $postgres.queryRealTimeEquipment({
-                ip : $scope.ip,
+                ip: $scope.ip,
                 callback: (err, count, rows) => {
-                    $scope.timers += 1;
-                    if(count > 0)
+                    if (count > 0) {
+                        rows[0]["daystoptime"] = toDate(rows[0]["daystoptime"]);
+                        rows[0]["nightruntime"] = toDate(rows[0]["nightruntime"]);
+                        rows[0]["nightstoptime"] = toDate(rows[0]["nightstoptime"]);
+                        rows[0]["dayruntime"] = toDate(rows[0]["dayruntime"]);
                         $scope.equipment = rows[0];
-                    $scope.$apply();
+                        $scope.$apply();
+                    }
                 }
             });
-        },500);
+        }, 500);
     };
 
     $scope.queryHistory = () => {
         clearInterval($scope.task);
-        $scope.equipment = null;
         $postgres.queryHistroyEquipment({
-            ip : $scope.ip,
+            ip: $scope.ip,
+            page: $scope.page,
             callback: (err, count, rows) => {
-                if(count > 0)
+                if (count > 0) {
+                    rows.forEach(row => {
+                        row["daystoptime"] = toDate(row["daystoptime"]);
+                        row["nightruntime"] = toDate(row["nightruntime"]);
+                        row["nightstoptime"] = toDate(row["nightstoptime"]);
+                        row["dayruntime"] = toDate(row["dayruntime"]);
+                    });
+                    $scope.equipment = null;
                     $scope.history = rows;
-                $scope.$apply();
+                    $scope.$apply();
+                }
             }
         });
     };
@@ -81,13 +103,13 @@ SmartPlant.controller("SmartPlantCtrl", ['$scope', '$interval', '$postgres', ($s
         ip: "192.168.1.2",
         name: "智能设备- 1"
     }, {
-        ip: "192.168.1.3",
+        ip: "192.168.1.5",
         name: "智能设备- 2"
     }, {
-        ip: "192.168.1.4",
+        ip: "192.168.1.6",
         name: "智能设备- 3"
     }, {
-        ip: "192.168.1.5",
+        ip: "192.168.1.10",
         name: "智能设备- 4"
     }];
 
@@ -115,9 +137,9 @@ SmartPlant.service('$postgres', function () {
             });
         },
         queryHistroyEquipment: queryObject => {
-            let {ip,callback} = queryObject;
-            if(!ip) return;
-            pool.query(`${selectRealTime} WHERE ip = $1::text`, [ip], (_err, _result) => {
+            let {ip,callback, page = 0} = queryObject;
+            if (!ip) return;
+            pool.query(`${selectHistroy} WHERE ip = $1::text LIMIT 30 offset $2::bigint`, [ip, page], (_err, _result) => {
                 if (callback) callback.apply(_result, [_err, _result["rowCount"], _result["rows"]]);
             });
         },

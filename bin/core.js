@@ -1,9 +1,9 @@
 /**
  * Created by afterloe on 16-1-7.
  */
-const [fs,uuid,dBug,dataPath,InnoDB] = [require("fs"), require('node-uuid'), true, `${process.env.APPDATA}/EngineeringWhite`, require(`${__dirname}/../domain/innoDB`)];
+const [fs, http, uuid, dBug, dataPath, InnoDB] = [require("fs"), require("http"), require('node-uuid'), true, `${process.env.APPDATA}/EngineeringWhite`, require(`${__dirname}/../domain/innoDB`)];
 
-let [userDir,readVersionInfo,deleteFile,uploadMateSite,updateLoinInfos,postFiles,randomCode,readUserInfo,vers,result,writeJournal,getTime,formatDate,getDataPath,writeData,getDateBase,constructionTable] = [
+let [userDir,readVersionInfo,deleteFile,postFiles,randomCode,readUserInfo,vers,result,writeJournal,getTime,formatDate,getDataPath,writeData,getDateBase,constructionTable] = [
 /**
  * userDir
  *
@@ -77,49 +77,6 @@ let [userDir,readVersionInfo,deleteFile,uploadMateSite,updateLoinInfos,postFiles
                 if (callback) callback(new Error(`${__path} delete fail, ${err.message}`), __path);
             }
         }
-    },
-/**
- * uploadMateSite
- *
- * 更新mate设置
- *
- * @param conf
- */
-    (conf, callback)=> {
-        let defaultConf = this.readJson("../conf/mate-site", true);
-        if (conf["rememberMe"] == undefined || typeof conf["rememberMe"] != "boolean")
-            conf["rememberMe"] = defaultConf["rememberMe"];
-        if (conf["autoUpdate"] == undefined || typeof conf["autoUpdate"] != "boolean")
-            conf["autoUpdate"] = defaultConf["autoUpdate"];
-        if (conf["defaultAccount"] == undefined)
-            conf["defaultAccount"] = defaultConf["defaultAccount"];
-        if (conf["defaultPass"] == undefined)
-            conf["defaultPass"] = defaultConf["defaultPass"];
-        defaultConf = null;
-        configuer.encryption(conf, "../conf/mate-site");
-        if (callback) callback();
-    },
-/**
- * updateLoinInfos
- *
- * 修改登录信息
- *
- * @param 职业行业
- */
-    (infos, callback) => {
-        if (!infos instanceof Object) {
-            if (callback) callback(new Error("Failed Params type"));
-            return;
-        }
-        let target = this.readJson(`${dataPath}/tmp/pid`, true);
-        if (!target) {
-            if (callback) callback(new Error("Failed to read config"));
-            return;
-        }
-        Object.assign(infos, target);
-        if (!target["id"] || "" == target["id"]) target["id"] = target["userId"];
-        configuer.encryption(target, `${dataPath}/tmp/pid`);
-        if (callback) callback();
     },
 /**
  * postFiles
@@ -318,8 +275,6 @@ module.exports.constructionTable = constructionTable;
 module.exports.userDir = userDir;
 module.exports.readVersionInfo = readVersionInfo;
 module.exports.deleteFile = deleteFile;
-module.exports.uploadMateSite = uploadMateSite;
-module.exports.updateLoinInfos = updateLoinInfos;
 module.exports.postFiles = postFiles;
 module.exports.randomCode = randomCode;
 module.exports.readUserInfo = readUserInfo;
@@ -335,6 +290,40 @@ module.exports.getDateBase = getDateBase;
 var hexcase = 0, b64pad = "", chrsz = 8;
 module.exports.hex_md5 = function (b) {
     return binl2hex(core_md5(str2binl(b), b.length * chrsz));
+};
+
+module.exports.accessMaster = (__regest,__data,__callback) => {
+    let __option = new Object(), req;
+    __data = new Buffer(__data);
+    __option.headers = {
+        "Content-Type": 'application/x-www-form-urlencoded',
+        "Content-Length": __data.length,
+        language : "ZH",
+        device: "pc",
+    };
+    Object.assign(__option,__regest);
+    req = http.request(__option, response => {
+        response.setEncoding("UTF-8");
+        let content = [];
+        response.on("data", chunk => content.push(chunk));
+        response.on("end", () => {
+            __callback(null, content.join(""));
+        });
+    });
+
+    req.setTimeout(15 * 1000, () => {
+        callback(new Error("请求超时"));
+    });
+
+    req.on('error', err => {
+        callback(err);
+    });
+
+    req.write(__data);
+
+    req.end(() => {
+        console.log("communication over");
+    });
 };
 
 /**
