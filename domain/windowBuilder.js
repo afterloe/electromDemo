@@ -38,8 +38,8 @@ class ContextFrameWindow {
             width,
             height
         } = engineerWhite.screen;
-        if (undefined === contextFrameWindow.width || "auto" === contextFrameWindow.width) contextFrameWindow.width = Math.ceil(width * 0.70) > 900 ? Math.ceil(width * 0.70) : 900;;
-        if (undefined === contextFrameWindow.height || "auto" === contextFrameWindow.height) contextFrameWindow.height = Math.ceil(height * 0.85) > 600 ? Math.ceil(height * 0.85) : 600;
+        if (undefined === contextFrameWindow.width || "auto" === contextFrameWindow.width) contextFrameWindow.width = Math.ceil(width * 0.70) > 1280 ? Math.ceil(width * 0.70) : 1280;
+        if (undefined === contextFrameWindow.height || "auto" === contextFrameWindow.height) contextFrameWindow.height = Math.ceil(height * 0.85) > 760 ? Math.ceil(height * 0.85) : 760;
         contextFrameWindow.icon = engineerWhite.icon;
         contextFrameWindow.title = `${contextFrameWindow.title} ${_param.title}`;
         frameWindow = new BrowserWindow(contextFrameWindow);

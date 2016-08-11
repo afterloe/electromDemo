@@ -28,7 +28,7 @@
     "alwaysOnTop" : true,
     "useContentSize" : true,
     "darkTheme" : true,
-    "debug" : true
+    "debug" : false
   },
   "contextFrameWindow" : {
     "width" : "auto",
@@ -38,6 +38,6 @@
     "title" : "TRU Engineer White - ",
     "useContentSize" : true,
     "darkTheme" : true,
-    "debug" : true
+    "debug" : false
   }
 }
