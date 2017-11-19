@@ -1,4 +1,7 @@
 node_modules/
+*ppt
+*xlsx
+*dll
 .idea/
 test/
 plugin/
